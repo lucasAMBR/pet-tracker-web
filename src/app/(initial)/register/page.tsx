@@ -1,5 +1,6 @@
 "use client"
 
+import CarrouselBanner from "@/components/register/carrousel-banner";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DatepickerInput } from "@/components/ui/date-input";
@@ -9,22 +10,6 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 
 const RegisterPage = () => {
-
-    const images = [
-        '/images/register_banner.jpg',
-        '/images/register_banner_2.jpg',
-        '/images/register_banner_3.jpg',
-    ]
-
-    const [currentImage, setCurrentimage] = useState<number>(0);
-
-    useEffect(() => {
-        const intervalId = setInterval(() => {
-            setCurrentimage(prevIndex => (prevIndex + 1) % images.length);
-        }, 5000);
-
-        return () => clearInterval(intervalId);
-    }, [])
 
     return (
         <div className="w-screen h-screen flex p-6 bg-neutral-100 dark:bg-neutral-900">
@@ -64,17 +49,7 @@ const RegisterPage = () => {
                     <Button className="cursor-pointer">Register</Button>
                 </form>
             </div>
-            <div
-                className="h-full flex-1 bg-cover bg-center rounded-3xl overflow-hidden"
-                style={{ backgroundImage: `url(${images[currentImage]})`, transition: 'background-image 1s ease-in-out' }}
-            >
-                <div className="w-full h-full bg-gradient-to-t from-black to-transparent flex items-end p-16">
-                    <div className="border-l border-white pl-3">
-                        <h3 className="text-3xl mb-4">Lorem Ipsum</h3>
-                        <p className="max-w-[400px] font-thin">blabla bla blabla, blablabla blabla blablabla, blabla bla blabla, blablabla blabla blablabla, blabla bla blabla, blablabla blabla blablabla</p>
-                    </div>
-                </div>
-            </div>
+            <CarrouselBanner />
         </div>
     );
 }
