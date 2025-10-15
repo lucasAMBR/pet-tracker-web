@@ -1,9 +1,9 @@
 "use client";
 
-import TopSearch from "./components/dashboard/topsearch";
-import UserCard from "./components/dashboard/UserCard";
-import PetCard from "./components/dashboard/PetCard";
-import MapPlaceholder from "./components/dashboard/MapPlaceholder";
+import TopSearch from "../../../components/dashboard/topsearch";
+import UserCard from "../../../components/dashboard/UserCard";
+import PetCard from "../../../components/dashboard/PetCard";
+import MapPlaceholder from "../../../components/dashboard/MapPlaceholder";
 
 export default function Page() {
   const pets = [
@@ -13,7 +13,7 @@ export default function Page() {
   ];
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(80%_60%_at_50%_0%,#d6f1ff,transparent_60%),linear-gradient(#cfeefe,#eaf6ff)] text-slate-900">
+    <div className="min-h-screen bg-[radial-gradient(80%_60%_at_50%_0%,#cffafe80,transparent_60%),linear-gradient(#cffafe,#ecfeff)] text-slate-900">
       <TopSearch />
 
       <main className="mx-auto max-w-7xl px-4 py-8 grid grid-cols-1 gap-6 md:grid-cols-[320px_1fr]">

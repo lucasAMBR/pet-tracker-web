@@ -2,8 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import Navbar from "./_components/navbar"
-import BlurText from "./_components/blur-text";
+import Navbar from "../../../components/landing_page/navbar"
+import BlurText from "../../../components/landing_page/blur-text";
 
 export default function Home() {
   return (

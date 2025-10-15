@@ -56,7 +56,7 @@ const CarrouselBanner = () => {
         <div className="relative h-full w-full flex-1 rounded-3xl overflow-hidden bg-black">
             <AnimatePresence>
                 <motion.div
-                    key={currentIndex} // A chave que dispara a animação
+                    key={currentIndex}
                     className="absolute inset-0 h-full w-full bg-cover bg-center"
                     style={{ backgroundImage: `url(${image})` }}
                     initial={{ opacity: 0 }}

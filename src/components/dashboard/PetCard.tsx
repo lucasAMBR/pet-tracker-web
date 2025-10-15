@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, PawPrint } from "lucide-react";
 
-export default function PetCard({ pet }) {
+export default function PetCard({ pet }: any) {
   const online = pet.trackerStatus === "online";
 
   return (
