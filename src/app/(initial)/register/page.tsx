@@ -15,13 +15,19 @@ import { useRouter } from "next/navigation";
 import { useRegister } from "@/hooks/Authentication/useRegister";
 import { format } from "date-fns";
 import BackButton from "@/components/ui/back-button";
+import { toast } from "sonner";
+import axios from "axios";
+import { ApiError } from "next/dist/server/api-utils";
+import { useState } from "react";
+import { ApiResponse } from "@/types/ApiResponse";
+import { api } from "@/lib/axios";
 
 const RegisterPage = () => {
 
     const router = useRouter();
 
     const {
-        mutate: registerNewUser,
+        mutateAsync: registerNewUser,
         isPending: registerIsPending,
         error: registerError,
     } = useRegister();
@@ -39,8 +45,29 @@ const RegisterPage = () => {
 
     const date = watch("birthday");
 
+    const [ apiValidationErrors, setApiValidationErrors ] = useState<ValidationErrors | null>()
+
     const onSubmit: SubmitHandler<RegisterFormSchemaType> = async(data) => {
-        registerNewUser(data);
+        try{
+            const apiResponse = await registerNewUser(data);
+
+            if(!apiResponse.success){
+                throw new Error(apiResponse.message)
+            }
+
+            toast.success(apiResponse.message+"!");
+        }catch (errors: any){
+            if (axios.isAxiosError<ApiResponse<ValidationErrors>>(errors)) {
+                const errorMessage = errors.response?.data?.message || errors.message;
+                if(errors.status == 422){
+                    setApiValidationErrors(errors.response?.data.data);
+                }   
+
+                toast.error(errorMessage);
+            } else{
+                toast.error(errors.message);
+            }
+        }
     }
 
     return (
@@ -53,7 +80,7 @@ const RegisterPage = () => {
                     <p className="my-6 font-bold text-xl" onClick={() => console.log(errors)}>Welcome!</p>
                 </div>
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3 w-auto max-w-[450px]">
-                    <FormErrorMessage errors={errors} />
+                    <FormErrorMessage errors={errors} apiErrors={apiValidationErrors}/>
                     <div className="">
                         <Label className="mb-2">Name</Label>
                         <Input 

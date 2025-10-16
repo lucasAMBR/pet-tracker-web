@@ -9,6 +9,8 @@ import { Label } from "@/components/ui/label";
 import { useLogin } from "@/hooks/Authentication/useLogin";
 import { LoginFormSchema, LoginFormSchemaType } from "@/schemas/login/LoginFormSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
+import { ApiError } from "next/dist/server/api-utils";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -27,7 +29,7 @@ const LoginPage = () => {
     const {
         register,
         handleSubmit,
-        formState: { errors, isSubmitting },
+        formState: { errors, isSubmitting, isLoading },
         reset
     } = useForm<LoginFormSchemaType>({ resolver: zodResolver(LoginFormSchema)});
 
@@ -35,11 +37,20 @@ const LoginPage = () => {
         try{
             const apiResponse = await login(data);
 
+            if(!apiResponse.success){
+                throw new Error(apiResponse.message)
+            }
+
             toast.success(apiResponse.message+"!");
-        }catch (error){
-            console.log(error);
+        }catch (errors: any){
+        if (axios.isAxiosError<ApiError>(errors)) {
+            const errorMessage = errors.response?.data?.message || errors.message;
+            toast.error(errorMessage);
+        } else{
+            toast.error(errors.message);
         }
     }
+}
 
     return(
         <div className="w-screen h-screen flex p-6 bg-neutral-100 dark:bg-neutral-900">
@@ -73,7 +84,7 @@ const LoginPage = () => {
                         />
                     </div>
                     <p className="text-xs my-1">Forgot your password? No problems, <span onClick={() => toast.error("toast")} className="text-cyan-700 font-bold cursor-pointer hover:underline">click here</span></p>
-                    <Button type="submit" className="cursor-pointer">Enter</Button>
+                    <Button type="submit" className="cursor-pointer">{isSubmitting   ? "Loading..." : "Enter"}</Button>
                     <p className="text-xs text-center">Doesn't have an account? <span className="text-cyan-700 font-bold cursor-pointer hover:underline" onClick={() => router.push("/register")}>click here</span></p>
                 </form>
             </div>

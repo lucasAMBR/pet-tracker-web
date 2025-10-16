@@ -6,19 +6,27 @@ import { AlertTriangle, ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "../ui/button";
 
-interface FormErrorMessageProps{
+interface ErrorBoxProps {
     errors: FieldErrors;
+
+    apiErrors?: ValidationErrors | null;
 }
 
-const FormErrorMessage = ({ errors }: FormErrorMessageProps) => {
+const ErrorBox = ({ errors, apiErrors }: ErrorBoxProps) => {
 
     const [currentIndex, setCurrentIndex] = useState(0);
 
     const errorMessages = useMemo(() => {
-        return Object.values(errors)
+
+        const clientErrors = Object.values(errors)
             .map((error) => error?.message)
-            .filter((message): message is string => !!message); // Garante que a lista só contenha strings
-    }, [errors]);
+            .filter((message): message is string => !!message);
+
+        const serverErrors = apiErrors ? Object.values(apiErrors).flat() : [];
+
+        return [...clientErrors, ...serverErrors];
+        
+    }, [errors, apiErrors]); 
 
     const handlePrevious = () => {
         setCurrentIndex((prev) => Math.max(0, prev - 1));
@@ -41,7 +49,7 @@ const FormErrorMessage = ({ errors }: FormErrorMessageProps) => {
             <AlertTriangle className="w-4 h-4" />
             <AlertTitle className="flex items-center justify-between mb-2">
                 <div>
-                Please fix the errors bellow:
+                    Please correct the errors below:
                 </div>
                 <div>
                     {errorMessages.length > 1 && (
@@ -56,7 +64,7 @@ const FormErrorMessage = ({ errors }: FormErrorMessageProps) => {
                             >
                                 <ChevronLeft className="w-4 h-4" />
                             </Button>
-                            <p>{currentIndex + 1} of {errorMessages.length}</p>
+                            <p>{currentIndex + 1} de {errorMessages.length}</p>
                             <Button
                                 type="button"
                                 variant="ghost" 
@@ -78,4 +86,4 @@ const FormErrorMessage = ({ errors }: FormErrorMessageProps) => {
     );
 }
 
-export default FormErrorMessage;
+export default ErrorBox;
