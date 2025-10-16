@@ -5,15 +5,23 @@ import CarrouselBanner from "@/components/register/carrousel-banner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useLogin } from "@/hooks/Authentication/useLogin";
 import { LoginFormSchema, LoginFormSchemaType } from "@/schemas/login/LoginFormSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 const LoginPage = () => {
 
     const router = useRouter();
+
+    const {
+        mutateAsync: login,
+        isPending: loginIsPending,
+        error: loginError,
+    } = useLogin();
 
     const {
         register,
@@ -23,7 +31,13 @@ const LoginPage = () => {
     } = useForm<LoginFormSchemaType>({ resolver: zodResolver(LoginFormSchema)});
 
     const onSubmit: SubmitHandler<LoginFormSchemaType> = async(data) => {
-        console.log(data);
+        try{
+            const apiResponse = await login(data);
+
+            toast.success(apiResponse.message+"!");
+        }catch (error){
+            console.log(error);
+        }
     }
 
     return(
@@ -56,7 +70,7 @@ const LoginPage = () => {
                             className="w-full" 
                         />
                     </div>
-                    <p className="text-xs my-1">Forgot your password? No problems, <span className="text-cyan-700 font-bold cursor-pointer hover:underline">click here</span></p>
+                    <p className="text-xs my-1">Forgot your password? No problems, <span onClick={() => toast.error("toast")} className="text-cyan-700 font-bold cursor-pointer hover:underline">click here</span></p>
                     <Button type="submit" className="cursor-pointer">Enter</Button>
                     <p className="text-xs text-center">Doesn't have an account? <span className="text-cyan-700 font-bold cursor-pointer hover:underline" onClick={() => router.push("/register")}>click here</span></p>
                 </form>

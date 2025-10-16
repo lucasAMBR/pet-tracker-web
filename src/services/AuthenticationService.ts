@@ -1,6 +1,8 @@
 import { api } from "@/lib/axios";
+import { LoginFormSchemaType } from "@/schemas/login/LoginFormSchema";
 import { RegisterFormSchemaType } from "@/schemas/register/RegisterFormSchema";
 import { ApiResponse } from "@/types/ApiResponse";
+import { LoginResponse } from "@/types/LoginResponse/LoginResponse";
 import { User } from "@/types/User/User";
 import { format } from "date-fns";
 
@@ -19,6 +21,19 @@ const registerNewUser = async(
     }
 }
 
+const login = async(
+    userCredentials: LoginFormSchemaType
+): Promise<ApiResponse<LoginResponse>> => {
+    try{
+        const response = await api.post("/auth/login", userCredentials);
+
+        return response.data;
+    }catch(error){
+        throw error;
+    }
+}
+
 export const authenticationService = {
-    registerNewUser
+    registerNewUser,
+    login
 }
