@@ -2,6 +2,7 @@
 
 import FormErrorMessage from "@/components/global/error-advertise";
 import CarrouselBanner from "@/components/register/carrousel-banner";
+import BackButton from "@/components/ui/back-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -42,6 +43,7 @@ const LoginPage = () => {
 
     return(
         <div className="w-screen h-screen flex p-6 bg-neutral-100 dark:bg-neutral-900">
+            <BackButton fallbackPath="/" isFixed={true}/>
             <div className="h-full flex-1 flex flex-col items-center justify-center">
                 <div className="flex flex-col items-center">
                     <Image src={"/images/logo_2.png"} alt="logo" width={100} height={100} />

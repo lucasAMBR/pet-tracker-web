@@ -14,6 +14,7 @@ import FormErrorMessage from "@/components/global/error-advertise";
 import { useRouter } from "next/navigation";
 import { useRegister } from "@/hooks/Authentication/useRegister";
 import { format } from "date-fns";
+import BackButton from "@/components/ui/back-button";
 
 const RegisterPage = () => {
 
@@ -44,6 +45,7 @@ const RegisterPage = () => {
 
     return (
         <div className="w-screen h-screen flex p-6 bg-neutral-100 dark:bg-neutral-900">
+            <BackButton fallbackPath="/" isFixed={true}/>
             <div className="h-full flex-1 flex flex-col items-center justify-center">
                 <div className="flex flex-col items-center">
                     <Image src={"/images/logo_2.png"} alt="logo" width={100} height={100} />
