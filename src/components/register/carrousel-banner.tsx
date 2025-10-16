@@ -1,25 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+
 const contentData = [
-	{
-		image: "/images/register_banner.jpg",
-		title: "Segurança Total",
-		description:
-			"Com nosso rastreador GPS, você acompanha cada passo do seu melhor amigo em tempo real. A tranquilidade de saber que ele está seguro não tem preço. Nunca mais passe pelo desespero de um pet perdido",
-	},
-	{
-		image: "/images/register_banner_2.jpg",
-		title: "Cuidado e Organização na Palma da Mão",
-		description:
-			"Centralize todo o histórico de saúde, vacinas e documentos do seu pet em um só lugar. Acesse facilmente as informações em consultas veterinárias ou emergências. A gestão da vida do seu bichinho nunca foi tão simples!",
-	},
-	{
-		image: "/images/register_banner_3.jpg",
-		title: "A Solução Completa Para Seu Pet",
-		description:
-			"O Pet Tracker une a segurança do rastreamento em tempo real com a praticidade da documentação digital. Viaje, passeie e cuide do seu pet com a certeza de que tem tudo sob controle. A ferramenta definitiva para o tutor moderno.",
-	},
+    {
+        image: "/images/register_banner.jpg",
+        title: "Total Security",
+        description: "With our GPS tracker, you can follow your best friend's every step in real time. The peace of mind of knowing they are safe is priceless. Never go through the despair of a lost pet again."
+    },
+    {
+        image: "/images/register_banner_2.jpg",
+        title: "Care and Organization in the Palm of Your Hand",
+        description: "Centralize your pet's entire health history, vaccinations, and documents in one place. Easily access information during veterinary appointments or emergencies. Managing your pet's life has never been so simple!"
+    },
+    {
+        image: "/images/register_banner_3.jpg",
+        title: "The Complete Solution For Your Pet",
+        description: "The Pet Tracker combines the security of real-time tracking with the convenience of digital documentation. Travel, walk, and care for your pet with the certainty that you have everything under control. The definitive tool for the modern pet owner."
+    }
 ];
 
 const textContainerVariants = {
