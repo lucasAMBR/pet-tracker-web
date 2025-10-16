@@ -1,8 +1,8 @@
-import { authenticationService } from "@/services/AuthenticationService"
-import { useMutation } from "@tanstack/react-query"
+import { authenticationService } from "@/services/AuthenticationService";
+import { useMutation } from "@tanstack/react-query";
 
 export const useLogin = () => {
-    return useMutation({
-        mutationFn: authenticationService.login
-    })
-}
+	return useMutation({
+		mutationFn: authenticationService.login,
+	});
+};

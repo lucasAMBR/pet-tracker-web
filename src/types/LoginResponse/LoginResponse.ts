@@ -1,6 +1,6 @@
-import { User } from "@/types/User/User"
+import { User } from "@/types/User/User";
 
 export type LoginResponse = {
-    user: User,
-    token: string
-}
+	user: User;
+	token: string;
+};

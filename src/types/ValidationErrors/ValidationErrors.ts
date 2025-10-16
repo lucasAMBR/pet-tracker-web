@@ -1,3 +1,3 @@
 type ValidationErrors = {
-    [key: string]: string[];
-}
+	[key: string]: string[];
+};

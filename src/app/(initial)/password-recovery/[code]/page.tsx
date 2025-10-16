@@ -1,13 +1,11 @@
-"use client"
+"use client";
 
-import { useParams } from "next/navigation"
+import { useParams } from "next/navigation";
 
 const UseRecoveryCodePage = () => {
-    const { code } = useParams();
+	const { code } = useParams();
 
-    return(
-        <p>{code}</p>
-    )
-}
+	return <p>{code}</p>;
+};
 
 export default UseRecoveryCodePage;
