@@ -13,16 +13,19 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 
-function formatDate(date: Date | undefined) {
-  if (!date) {
-    return ""
+function formatDate(date: Date | undefined): string {
+  // A verificação crucial:
+  // Só prossegue se 'date' for um objeto Date e não for uma "Data Inválida".
+  if (date instanceof Date && !isNaN(date.getTime())) {
+    return date.toLocaleDateString("en-US", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    });
   }
-
-  return date.toLocaleDateString("en-US", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  })
+  
+  // Para qualquer outro caso (undefined, null, data inválida), retorna uma string vazia.
+  return "";
 }
 
 function isValidDate(date: Date | undefined) {

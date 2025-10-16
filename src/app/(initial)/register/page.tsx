@@ -11,8 +11,19 @@ import Image from "next/image";
 import { SubmitHandler, useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod"
 import FormErrorMessage from "@/components/global/error-advertise";
+import { useRouter } from "next/navigation";
+import { useRegister } from "@/hooks/Authentication/useRegister";
+import { format } from "date-fns";
 
 const RegisterPage = () => {
+
+    const router = useRouter();
+
+    const {
+        mutate: registerNewUser,
+        isPending: registerIsPending,
+        error: registerError,
+    } = useRegister();
 
     // Isso aqui é o controle do formulario usando RHF
     const {
@@ -25,10 +36,10 @@ const RegisterPage = () => {
         reset
     } = useForm<RegisterFormSchemaType>({resolver: zodResolver(RegisterFormSchema)});
 
-    const date = watch("birthdate");
+    const date = watch("birthday");
 
     const onSubmit: SubmitHandler<RegisterFormSchemaType> = async(data) => {
-        console.log(data);
+        registerNewUser(data);
     }
 
     return (
@@ -39,9 +50,7 @@ const RegisterPage = () => {
                     <h2 className="text-3xl text-cyan-600 font-bold my-2">Pet Tracker</h2>
                     <p className="my-6 font-bold text-xl" onClick={() => console.log(errors)}>Welcome!</p>
                 </div>
-                <div>
-                </div>
-                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3 w-auto">
+                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3 w-auto max-w-[450px]">
                     <FormErrorMessage errors={errors} />
                     <div className="">
                         <Label className="mb-2">Name</Label>
@@ -82,8 +91,8 @@ const RegisterPage = () => {
                             className="w-full" 
                         />
                     </div>
-                    <input type="hidden" {...register("birthdate")} />
-                    <DatepickerInput value={date} onChange={(date) => setValue('birthdate', date as Date)}/>
+                    <input type="hidden" {...register("birthday")} />
+                    <DatepickerInput value={date} onChange={(date) => setValue('birthday', date as Date)}/>
                     <div className="flex items-start gap-3 my-4">
                        <Controller
                             name="terms"
@@ -109,6 +118,7 @@ const RegisterPage = () => {
                         />
                     </div>
                     <Button type="submit" className="cursor-pointer">Register</Button>
+                    <p className="text-xs text-center">Already have an account? <span className="text-cyan-700 font-bold cursor-pointer hover:underline" onClick={() => router.push("/login")}>click here</span></p>
                 </form>
             </div>
             <CarrouselBanner />

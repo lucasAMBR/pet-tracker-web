@@ -9,7 +9,7 @@ export const RegisterFormSchema = z.object({
         .min(11, "The cpf field must have at least 11 characters")
         .max(14, "The cpf field must have a maximum of 14 characters"),
     password: z.string().min(8, "The password must have at least 8 characters"),
-    birthdate: z.date(),
+    birthday: z.date(),
     terms: z.literal(true, "You must accept the terms and conditions to continue")
 })
 
