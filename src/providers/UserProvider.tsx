@@ -1,5 +1,3 @@
-// providers/UserProvider.tsx (seu AuthProvider)
-
 "use client";
 
 import { api } from "@/lib/axios";
@@ -12,14 +10,14 @@ import React, {
     useEffect,
     useCallback,
 } from "react";
-// Importe um componente de Spinner ou qualquer loader que você tenha
+
 import { Spinner } from "@/components/ui/spinner"; 
 
 interface AuthContextType {
     user: User | null;
     token: string | null;
     isAuthenticated: boolean;
-    loading: boolean; // <- Expor o loading pode ser útil
+    loading: boolean;
     login: (data: LoginResponse) => void;
     logout: () => void;
 }
@@ -31,7 +29,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
     const [user, setUser] = useState<User | null>(null);
     const [token, setToken] = useState<string | null>(null);
-    const [loading, setLoading] = useState<boolean>(true); // <- Começa como true
+    const [loading, setLoading] = useState<boolean>(true);
 
     const login = useCallback((data: LoginResponse) => {
         const userToStore = data.user;
