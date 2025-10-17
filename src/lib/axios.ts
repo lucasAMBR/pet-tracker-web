@@ -24,3 +24,17 @@ api.interceptors.request.use(
 		return Promise.reject(error);
 	},
 );
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      console.log('Authentication error (401). Redirecting to login.');
+      localStorage.removeItem('@tracker_token');
+
+      window.location.href = '/login?reason=session-expired'; 
+    }
+    
+    return Promise.reject(error);
+  }
+);

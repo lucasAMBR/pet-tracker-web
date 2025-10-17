@@ -7,6 +7,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import ReactQueryProvider from "@/providers/QueryProvider";
 import { Toaster } from "sonner";
 import { NavigationProvider } from "@/providers/NavigationProvider";
+import { AuthProvider } from "@/providers/UserProvider";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -33,15 +34,17 @@ export default function RootLayout({
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 			>
-				<NavigationProvider>
-					<ReactQueryProvider>
-						<ThemeProvider>
-							{children}
-							<ThemeToggle />
-							<Toaster position="top-center" />
-						</ThemeProvider>
-					</ReactQueryProvider>
-				</NavigationProvider>
+				<AuthProvider>
+					<NavigationProvider>
+						<ReactQueryProvider>
+							<ThemeProvider>
+								{children}
+								<ThemeToggle />
+								<Toaster position="top-center" />
+							</ThemeProvider>
+						</ReactQueryProvider>
+					</NavigationProvider>
+				</AuthProvider>
 			</body>
 		</html>
 	);

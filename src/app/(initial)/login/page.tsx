@@ -6,7 +6,9 @@ import BackButton from "@/components/ui/back-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
 import { useLogin } from "@/hooks/Authentication/useLogin";
+import { useAuth } from "@/providers/UserProvider";
 import {
 	LoginFormSchema,
 	LoginFormSchemaType,
@@ -15,15 +17,20 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { ApiError } from "next/dist/server/api-utils";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 const LoginPage = () => {
+	const searchParams = useSearchParams();
+	
 	const router = useRouter();
 
+	const { login } = useAuth();
+
 	const {
-		mutateAsync: login,
+		mutateAsync: doLogin,
 		isPending: loginIsPending,
 		error: loginError,
 	} = useLogin();
@@ -37,13 +44,23 @@ const LoginPage = () => {
 
 	const onSubmit: SubmitHandler<LoginFormSchemaType> = async (data) => {
 		try {
-			const apiResponse = await login(data);
+			const apiResponse = await doLogin(data);
 
 			if (!apiResponse.success) {
 				throw new Error(apiResponse.message);
 			}
 
 			toast.success(apiResponse.message + "!");
+
+			const loggedUser = apiResponse.data.user;
+
+			login(apiResponse.data);
+
+			if(!loggedUser.has_address || !loggedUser.has_phone){
+				router.push("/missing-data")
+			}else{
+				router.push("/dashboard");
+			}
 		} catch (errors: any) {
 			if (axios.isAxiosError<ApiError>(errors)) {
 				const errorMessage = errors.response?.data?.message || errors.message;
@@ -53,6 +70,16 @@ const LoginPage = () => {
 			}
 		}
 	};
+
+	const [ notification, setNotification ] = useState<boolean>(false);
+
+	useEffect(() => {
+		const reason = searchParams.get('reason');
+
+		if(reason === 'session-expired'){
+			setNotification(true);
+		}
+	}, [])
 
 	return (
 		<div className="w-screen h-screen flex p-6 bg-neutral-100 dark:bg-neutral-900">
@@ -103,7 +130,7 @@ const LoginPage = () => {
 						</span>
 					</p>
 					<Button type="submit" className="cursor-pointer">
-						{isSubmitting ? "Loading..." : "Enter"}
+						{isSubmitting ? <Spinner /> : "Enter"}
 					</Button>
 					<p className="text-xs text-center">
 						Doesn't have an account?{" "}

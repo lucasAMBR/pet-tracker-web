@@ -24,6 +24,7 @@ import { ApiError } from "next/dist/server/api-utils";
 import { useState } from "react";
 import { ApiResponse } from "@/types/ApiResponse";
 import { api } from "@/lib/axios";
+import { Spinner } from "@/components/ui/spinner";
 
 const RegisterPage = () => {
 	const router = useRouter();
@@ -172,7 +173,7 @@ const RegisterPage = () => {
 						/>
 					</div>
 					<Button type="submit" className="cursor-pointer">
-						Register
+						{isSubmitting ? <Spinner /> : "Register"}
 					</Button>
 					<p className="text-xs text-center">
 						Already have an account?{" "}
