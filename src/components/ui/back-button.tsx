@@ -16,18 +16,7 @@ const BackButton = ({
 	const router = useRouter();
 
 	const handleBack = () => {
-		/**
-		 * A fonte da verdade para o histórico de navegação é o próprio navegador.
-		 * Esta lógica verifica se há para onde voltar *dentro da aba atual*.
-		 *
-		 * - Se `window.history.length > 2`, significa que o usuário navegou de
-		 * pelo menos uma outra página DENTRO do nosso site para chegar aqui.
-		 * Nesse caso, `router.back()` é seguro.
-		 *
-		 * - Se `window.history.length <= 2`, o usuário provavelmente acessou esta
-		 * página diretamente. Usamos `router.replace(fallbackPath)` para
-		 * substituir a entrada "morta" do histórico pela página de fallback.
-		 */
+
 		if (window.history.length > 2) {
 			router.back();
 		} else {
@@ -38,8 +27,8 @@ const BackButton = ({
 	return (
 		<div
 			className={`rounded-md flex items-center justify-center
-                bg-neutral-900 hover:bg-neutral-700 text-white 
-                dark:bg-white dark:hover:bg-neutral-300 dark:text-black
+                bg-cyan-950 hover:bg-cyan-900 text-white 
+                dark:bg-cyan-700 dark:hover:bg-cyan-600
                 ${isFixed ? "fixed top-0 left-0 m-6" : ""} p-2 cursor-pointer`}
 			onClick={handleBack}
 		>

@@ -8,6 +8,7 @@ import ReactQueryProvider from "@/providers/QueryProvider";
 import { Toaster } from "sonner";
 import { NavigationProvider } from "@/providers/NavigationProvider";
 import { AuthProvider } from "@/providers/UserProvider";
+import { NextThemeProvider } from "@/providers/NextThemeProvider";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -37,11 +38,16 @@ export default function RootLayout({
 				<AuthProvider>
 					<NavigationProvider>
 						<ReactQueryProvider>
-							<ThemeProvider>
+							<NextThemeProvider 								
+								attribute="class"
+          						defaultTheme="system"
+          						enableSystem
+          						disableTransitionOnChange
+							>
 								{children}
 								<ThemeToggle />
 								<Toaster position="top-center" />
-							</ThemeProvider>
+							</NextThemeProvider>
 						</ReactQueryProvider>
 					</NavigationProvider>
 				</AuthProvider>
