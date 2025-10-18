@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Syringe, BadgeInfo, Footprints } from "lucide-react";
 import Image from "next/image";
-import type { Pet } from "@/app/(initial)/dashboard/page";
+import type { Pet } from "@/app/(private)/dashboard/page";
 
 // Fubncao para verificar quantas horas falta para uma data
 const daysUntil = (iso: string) => {
@@ -39,7 +39,7 @@ export default function PetCard({ pet }: { pet: Pet }) {
     <Card className="rounded-2xl bg-white shadow-md hover:shadow-lg transition overflow-hidden dark:bg-neutral-800 dark:shadow-black/10">
       {/* Capa */}
       <div className="relative w-full h-40">
-        <Image src={pet.headerImage} alt={pet.name} fill className="object-cover" priority />
+        <Image src={pet.headerImage} alt={pet.name} fill className="object-cover h-full" priority />
         <Badge
           className={`absolute top-3 right-3 text-xs text-white ${
             online
@@ -54,29 +54,30 @@ export default function PetCard({ pet }: { pet: Pet }) {
       {/* Conteúdo */}
       <CardContent className="p-4">
         {/* header */}
-        <div className="flex items-start justify-between">
-          <div>
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-              {pet.name}
-            </h3>
+        <div className="flex items-center justify-between">
+          <div className="w-full">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+                {pet.name}
+              </h3>
+              <div className="flex gap-1">
+                {pet.pills.map((p) => (
+                  <span
+                    key={`${pet.id}-${p.label}`}
+                    className={`text-xs px-2 py-1 rounded-full flex items-center truncate ${
+                      p.tone === "blue"
+                        ? "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-200"
+                        : p.tone === "green"
+                        ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-200"
+                        : "bg-pink-100 text-pink-700 dark:bg-pink-900/40 dark:text-pink-200"
+                    }`}
+                  >
+                    {p.label}
+                  </span>
+                ))}
+              </div>
+            </div>
             <p className="text-sm text-slate-600 dark:text-slate-300">{pet.breed}</p>
-          </div>
-
-          <div className="flex gap-2">
-            {pet.pills.map((p) => (
-              <span
-                key={`${pet.id}-${p.label}`}
-                className={`text-xs px-2 py-1 rounded-full ${
-                  p.tone === "blue"
-                    ? "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-200"
-                    : p.tone === "green"
-                    ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-200"
-                    : "bg-pink-100 text-pink-700 dark:bg-pink-900/40 dark:text-pink-200"
-                }`}
-              >
-                {p.label}
-              </span>
-            ))}
           </div>
         </div>
 

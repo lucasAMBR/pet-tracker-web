@@ -1,7 +1,7 @@
 "use client";
 
 import PetCard from "./PetCard";
-import type { Pet } from "@/app/(initial)/dashboard/page";
+import type { Pet } from "@/app/(private)/dashboard/page";
 
 interface PetGridProps {
   pets: Pet[];
