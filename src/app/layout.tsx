@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/providers/ThemeProvider";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { QueryClientProvider } from "@tanstack/react-query";
 import ReactQueryProvider from "@/providers/QueryProvider";

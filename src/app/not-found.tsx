@@ -2,7 +2,6 @@
 
 import FuzzyText from "@/components/NotFound/FuzzyText";
 import { Button } from "@/components/ui/button";
-import { useTheme } from "@/providers/ThemeProvider";
 import { useRouter } from "next/navigation";
 
 const NotFoundPage = () => {
