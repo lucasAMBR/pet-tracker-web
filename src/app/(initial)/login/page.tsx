@@ -2,6 +2,7 @@
 
 import FormErrorMessage from "@/components/global/error-advertise";
 import CarrouselBanner from "@/components/register/carrousel-banner";
+import { Alert, AlertTitle } from "@/components/ui/alert";
 import BackButton from "@/components/ui/back-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,6 +44,7 @@ const LoginPage = () => {
 	} = useForm<LoginFormSchemaType>({ resolver: zodResolver(LoginFormSchema) });
 
 	const onSubmit: SubmitHandler<LoginFormSchemaType> = async (data) => {
+		setNotification(false);
 		try {
 			const apiResponse = await doLogin(data);
 
@@ -72,12 +74,14 @@ const LoginPage = () => {
 	};
 
 	const [ notification, setNotification ] = useState<boolean>(false);
+	const [ notificationMessage, setNotificationMessage] = useState<string>("");
 
 	useEffect(() => {
 		const reason = searchParams.get('reason');
 
 		if(reason === 'session-expired'){
 			setNotification(true);
+			setNotificationMessage("You have been logged out due to your access token expiring.");
 		}
 	}, [])
 
@@ -100,6 +104,11 @@ const LoginPage = () => {
 					className="flex flex-col gap-3 w-[450px]"
 				>
 					<FormErrorMessage errors={errors} />
+					{notification && (
+						<Alert variant={"destructive"} role="alert">
+							<AlertTitle>{notificationMessage}</AlertTitle>
+						</Alert>
+					)}
 					<div className="">
 						<Label className="mb-2">Email</Label>
 						<Input
