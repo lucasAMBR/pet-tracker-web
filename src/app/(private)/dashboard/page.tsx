@@ -1,74 +1,83 @@
 "use client";
 
 import TopSearch from "../../../components/dashboard/topsearch";
-import UserCard from "../../../components/dashboard/UserCard";
-import PetCard from "../../../components/dashboard/PetCard";
-import MapPlaceholder from "../../../components/dashboard/MapPlaceholder";
+import ProfileSidebar from "../../../components/dashboard/ProfileSidebar";
+import PetGrid from "../../../components/dashboard/PetGrid";
+import CareTips from "../../../components/dashboard/CareTips";
+
+export type PillTone = "blue" | "green" | "pink";
+export type Pet = {
+  id: string;
+  name: string;
+  breed: string;
+  gender: string;
+  age: string;
+  status: "Localizado" | "Alerta";
+  vaccineStatus: string;
+  vaccineLast: string;
+  microchip: string;
+  lastWalk: string;
+  headerImage: string;
+  pills: { label: string; tone: PillTone }[];
+  nextVaccine?: {
+    dateISO: string;      
+    windowDays?: number;   //Calcular o progresso da barra da vacina EM DIAS!
+  };
+};
 
 export default function Page() {
-	const pets = [
-		{
-			id: "1",
-			name: "Thor",
-			species: "Cachorro",
-			sex: "M",
-			age: "3 anos",
-			lastVaccine: "20/08/2025",
-			lastSeen: "Último visto há 4 min — Rua das Flores, 125",
-			trackerStatus: "online",
-		},
-		{
-			id: "2",
-			name: "Mia",
-			species: "Gato",
-			sex: "F",
-			age: "1 ano",
-			lastVaccine: "04/06/2025",
-			lastSeen: "Último visto há 2 h — Casa (Sala)",
-			trackerStatus: "offline",
-		},
-		{
-			id: "3",
-			name: "Lua",
-			species: "Cachorro",
-			sex: "F",
-			age: "5 anos",
-			lastVaccine: "12/07/2025",
-			lastSeen: "Último visto há 10 min — Praça Central",
-			trackerStatus: "online",
-		},
-	];
+  const petBase: Pet = {
+    id: "1",
+    name: "Dogan",
+    breed: "Molestador Frances",
+    gender: "Macho",
+    age: "3 anos",
+    status: "Alerta",
+    vaccineStatus: "Localizado",
+    vaccineLast: "02/03/2023",
+    microchip: "#12345678",
+    lastWalk: "Hoje, 14:30",
+    headerImage: "/images/Dogan.png", 
+    pills: [
+      { label: "Macho", tone: "blue" },
+      { label: "3 anos", tone: "green" },
+    ],
+    nextVaccine: {
+      dateISO: "2025-10-15", 
+      windowDays: 10,
+    },
+  };
 
-	return (
-		<div className="min-h-screen bg-[radial-gradient(80%_60%_at_50%_0%,#cffafe80,transparent_60%),linear-gradient(#cffafe,#ecfeff)] text-slate-900">
-			<TopSearch />
+  
+const pets: Pet[] = [];
 
-			<main className="mx-auto max-w-7xl px-4 py-8 grid grid-cols-1 gap-6 md:grid-cols-[320px_1fr]">
-				<aside className="md:sticky md:top-24 self-start">
-					<UserCard />
-				</aside>
+for (let i = 0; i < 6; i++) {
+  const newPet = {
+    ...petBase,
+    id: String(i + 1),
+  };
 
-				<section className="space-y-6">
-					{/* Card de lista dos pets */}
-					<div className="rounded-3xl border border-white/40 bg-white/70 dark:bg-black backdrop-blur-xl shadow-[0_20px_50px_rgba(2,6,23,0.08)] ring-1 ring-sky-200/30">
-						<div className="flex items-center justify-between p-5 border-b border-slate-200/60">
-							<h3 className="text-lg font-semibold tracking-tight">
-								Animais cadastrados
-							</h3>
-							<span className="text-xs rounded-full border px-2 py-1 bg-white/80">
-								Total: {pets.length}
-							</span>
-						</div>
-						<div className="p-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
-							{pets.map((p) => (
-								<PetCard key={p.id} pet={p} />
-							))}
-						</div>
-					</div>
+  pets.push(newPet);
+}
 
-					<MapPlaceholder />
-				</section>
-			</main>
-		</div>
-	);
+
+  return (
+    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-neutral-950 dark:text-slate-100 transition-colors duration-300">
+      <TopSearch />
+
+      <div className="mx-auto max-w-[1200px] gap-6 px-4 py-8 grid grid-cols-1 md:grid-cols-[300px_1fr]">
+        {/* Sidebar */}
+        <aside className="md:sticky md:top-20 self-start">
+          <ProfileSidebar />
+        </aside>
+
+        {/* Conteúdo principal */}
+        <main className="space-y-6">
+          <h1 className="text-3xl font-bold tracking-tight">Meus Cachorros</h1>
+          <PetGrid pets={pets} />
+          <CareTips />
+        </main>
+      </div>
+    </div>
+  );
 }

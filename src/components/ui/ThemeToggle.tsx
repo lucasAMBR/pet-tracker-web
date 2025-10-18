@@ -1,23 +1,22 @@
 "use client";
 
-import { useTheme } from "../../providers/ThemeProvider";
 import { Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
 
 export function ThemeToggle() {
-	const { isDark, toggleTheme } = useTheme();
+	const { setTheme } = useTheme()
 
 	return (
-		<button
-			onClick={toggleTheme}
-			className="fixed right-0 bottom-0 m-6 p-4 cursor-pointer rounded-md 
-                bg-neutral-900 dark:bg-white hover:bg-neutral-700 dark:hover:bg-gray-300 transition-all duration-300"
+		<div
+			className="fixed right-0 bottom-0 m-6 cursor-pointer rounded-md bg-cyan-950 dark:bg-cyan-700 text-white"
 			aria-label="Alternar tema"
 		>
-			{isDark ? (
-				<Sun className="w-4 h-4 text-neutral-900" />
-			) : (
-				<Moon className="w-4 h-4 text-white" />
-			)}
-		</button>
+			<div className="hidden dark:flex w-full h-full p-4" onClick={() => setTheme('light')}>
+				<Sun />
+			</div>
+			<div className="flex dark:hidden w-full h-full p-4" onClick={() => setTheme('dark')}>
+				<Moon />
+			</div>
+		</div>
 	);
 }
