@@ -12,7 +12,7 @@ export const api = axios.create({
 
 api.interceptors.request.use(
 	(config) => {
-		const token = localStorage.getItem("trackerAuthToken");
+		const token = localStorage.getItem("@tracker_token");
 
 		if (token) {
 			config.headers.Authorization = `Bearer ${token}`;

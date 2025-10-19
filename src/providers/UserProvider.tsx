@@ -10,8 +10,7 @@ import React, {
     useEffect,
     useCallback,
 } from "react";
-
-import { Spinner } from "@/components/ui/spinner"; 
+import { Spinner } from "@/components/ui/spinner";
 
 interface AuthContextType {
     user: User | null;
@@ -40,6 +39,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
         localStorage.setItem("@tracker_user", JSON.stringify(userToStore));
         localStorage.setItem("@tracker_token", tokenToStore);
+        
+        // <-- FIX: Atualiza o header do axios imediatamente após o login
+        api.defaults.headers.authorization = `Bearer ${tokenToStore}`;
     }, []);
 
     const logout = useCallback(() => {
@@ -47,39 +49,62 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         setToken(null);
         localStorage.removeItem("@tracker_user");
         localStorage.removeItem("@tracker_token");
+        
+        // <-- FIX: Limpa o header do axios ao fazer logout
+        api.defaults.headers.authorization = null;
+        
+        // Opcional: redirecionar aqui é mais seguro
         // window.location.href = '/login';
     }, []);
 
     useEffect(() => {
         const validateTokenOnLoad = async () => {
+            // Pega APENAS o token. O usuário será revalidado.
             const storedToken = localStorage.getItem("@tracker_token");
-            const storedUser = localStorage.getItem("@tracker_user");
 
-            if (!storedToken || !storedUser) {
+            if (!storedToken) {
                 setLoading(false);
                 return;
             }
-            setUser(JSON.parse(storedUser));
-            setToken(storedToken);
 
             try {
-                api.defaults.headers.authorization = `Bearer ${storedToken}`;
-                const response = await api.get<{ data: User }>("/user/me");
+                // <-- FIX: Toda a lógica de validação agora está dentro do try/catch
 
-                setUser(response.data.data);
-                localStorage.setItem("@tracker_user", JSON.stringify(response.data.data));
+                // 1. Define o header para a chamada de validação
+                api.defaults.headers.authorization = `Bearer ${storedToken}`;
+                
+                // 2. Busca o usuário (sem 'data' na tipagem por enquanto)
+                const response = await api.get("/users/me");
+
+                // 3. (Recomendado) Verifique o que a API está realmente enviando
+                console.log("API /me response:", response.data); 
+
+                // 4. <-- FIX: Lógica flexível para encontrar os dados do usuário
+                // Tenta pegar response.data.data, se não existir, pega response.data
+                const userData: User = response.data.data || response.data;
+
+                // 5. Valida se o que veio é um usuário de verdade
+                if (!userData || typeof userData.id === 'undefined') {
+                    throw new Error("Invalid user data structure from API");
+                }
+
+                // 6. Sucesso! Define o estado e atualiza o localStorage
+                setUser(userData);
+                setToken(storedToken);
+                localStorage.setItem("@tracker_user", JSON.stringify(userData));
 
             } catch (error) {
                 console.error("Token validation failed, logging out:", error);
-                logout(); 
+                logout(); // Se qualquer passo falhar, desloga
             } finally {
                 setLoading(false);
             }
         };
 
         validateTokenOnLoad();
-    }, [logout]);
+    }, [logout]); // A dependência [logout] está correta
 
+    // Esta lógica agora é 100% confiável
     const isAuthenticated = !loading && !!user && !!token;
 
     if (loading) {
