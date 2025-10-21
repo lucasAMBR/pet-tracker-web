@@ -25,7 +25,9 @@ const login = async (
 	userCredentials: LoginFormSchemaType,
 ): Promise<ApiResponse<LoginResponse>> => {
 	try {
-		const response = await api.post("/auth/login", userCredentials);
+		const response = await api.post("/auth/login", userCredentials, {
+			_skipAuthRedirect: true
+		});
 
 		return response.data;
 	} catch (error) {
