@@ -6,11 +6,14 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { MapPin, Phone, Mail, PawPrint } from "lucide-react";
 import { useAuth } from "@/providers/UserProvider";
+import { SheetDemo } from "../dashboard/editprofile";
+
+
 
 export default function ProfileSidebar() {
 
   const { user } = useAuth();
- 
+   
   return (
     <Card className="rounded-md bg-white shadow-md hover:shadow-lg transition dark:bg-neutral-800 dark:shadow-black/10">
       <CardHeader className="flex flex-col items-center">
@@ -52,13 +55,10 @@ export default function ProfileSidebar() {
             <strong>6</strong> cachorros registrados
           </span>
         </div>
-
-        <Button
-          variant="default"
-          className="w-full mt-2 cursor-pointer"
-        >
-          Editar Perfil
-        </Button>
+        
+<div className="mt-2">
+          <SheetDemo />
+        </div>
       </CardContent>
     </Card>
   );
