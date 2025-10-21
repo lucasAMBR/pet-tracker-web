@@ -1,0 +1,15 @@
+type Address = {
+    id: number,
+    user_id: string,
+    cep: string,
+    number: string,
+    street: string,
+    district: string,
+    city: string,
+    state: string,
+    complement: string,
+    latitude: number,
+    longitude: number,
+    updated_at: Date,
+    created_at: Date,
+}

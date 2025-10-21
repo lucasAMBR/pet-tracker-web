@@ -8,9 +8,15 @@ import { motion } from 'framer-motion'
 import { Input } from "@/components/ui/input";
 import { Label } from "@radix-ui/react-label";
 import { Button } from "@/components/ui/button";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { RegisterAddressSchema, RegisterAddressSchemaType } from "@/schemas/addresses/RegisterAddressSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Spinner } from "@/components/ui/spinner";
+import { useRegisterAddress } from "@/hooks/Address/useRegisterAddress";
+import ErrorBox from "@/components/global/error-advertise";
+import { toast } from "sonner";
+import { useRegisterPhone } from "@/hooks/Phone/useRegisterPhone";
+import { RegisterPhoneSchema, RegisterPhoneSchemaType } from "@/schemas/phones/RegisterPhoneSchema";
 
 const MissingDataPage = () => {
 
@@ -28,7 +34,15 @@ const MissingDataPage = () => {
         return null;
     }
 
+    useEffect(() => {
+        if(user.has_address){
+            setRegisterStep("phone");
+        }
+    }, []);
+
     const [isFetchingCEP, setIsFetchingCEP] = useState<boolean>(false);
+
+    const [ registerStep, setRegisterStep ] = useState<"address" | "phone">("address");
 
     const {
         register: registerAddress,
@@ -51,6 +65,12 @@ const MissingDataPage = () => {
             complement: ''
         }
     })
+
+    const {
+        mutateAsync: registerNewAddress,
+        isPending: registerAddressIsPending,
+        error: addressApiError
+    } = useRegisterAddress();
 
     const cep = watch('cep');
 
@@ -99,6 +119,46 @@ const MissingDataPage = () => {
         fetchAddress();
     }, [cep, setValue, setError, clearErrors, setFocus])
 
+    const addressSubmit: SubmitHandler<RegisterAddressSchemaType> = async(data) => {
+        try{
+            const newAddress = await registerNewAddress(data);
+
+            toast(newAddress.message);
+            if(user.has_phone){
+                router.push("/dashboard");
+            }else{
+                setRegisterStep("phone");
+            }
+        }catch(error){
+            console.log(error);
+        }
+    }
+
+    const {
+        mutateAsync: registerNewPhone,
+        isPending: registerPhoneIsPending,
+        error: phoneError,
+    } = useRegisterPhone();
+
+    const {
+        register: registerPhone,
+        handleSubmit: handleSubmitPhone,
+        formState: {errors: phoneFormErrors, isSubmitting: phoneFormIsSubmitting, isSubmitted: phoneFormIsSubmitted}
+    } = useForm<RegisterPhoneSchemaType>({
+        resolver: zodResolver(RegisterPhoneSchema),
+        defaultValues: {
+            number: ''
+        }
+    })
+
+    const phoneSubmit: SubmitHandler<RegisterPhoneSchemaType> = async(data) => {
+        const newPhone = await registerNewPhone(data);
+
+        toast(newPhone.message);
+
+        router.push("/dashboard");
+    }
+
     return(
         <div className="w-screen h-screen flex items-center justify-center flex-col dark:bg-neutral-900">
             <div className="flex gap-4">
@@ -128,82 +188,111 @@ const MissingDataPage = () => {
                     </motion.p>
                     <div className="flex flex-col items-center border border-neutral-200 dark:border-neutral-800 p-6 rounded-md">
                         <div className="w-24 h-24 flex items-center justify-center flex-col rounded-full border-2 border-cyan-700 my-3">
-                            <h3 className="font-bold text-xl">1º</h3>
+                            <h3 className="font-bold text-xl">{registerStep == 'address' ? "1º" : "2º" }</h3>
                             <p>Step</p>
                         </div>
-                        <form className="w-full">
-                            <h2 className="text-xl text-cyan-700 font-semibold mb-2">The address</h2>
-                            <p className="mb-4">
-                                The address is essential to us on the pet recovery, and allow to see 
-                                where that lost pet lives and where to leave them in safety
-                            </p>
-                            <div className="flex gap-2 w-full">
-                                <div className="flex flex-col w-full">
-                                    <Label>CEP</Label>
-                                    <Input 
-                                        {...registerAddress('cep')}
-                                        className="mb-3" 
-                                        placeholder="CEP" 
-                                        type="text" 
-                                    />
+                        {registerStep === "address" && (
+                            <form onSubmit={handleSubmitAddress(addressSubmit)} className="w-full">
+                                <h2 className="text-xl text-cyan-700 font-semibold mb-2">The address</h2>
+                                <p className="mb-4">
+                                    The address is essential to us on the pet recovery, and allow to see 
+                                    where that lost pet lives and where to leave them in safety
+                                </p>
+                                <ErrorBox errors={addressErrors}/>
+                                <div className="flex gap-2 w-full mt-2">
+                                    <div className="flex flex-col w-full">
+                                        <Label>CEP</Label>
+                                        <Input 
+                                            {...registerAddress('cep')}
+                                            className="mb-3" 
+                                            placeholder="CEP" 
+                                            type="text" 
+                                        />
+                                    </div>
+                                    {isFetchingCEP && <Spinner />}
+                                    <div className="flex flex-col w-full">
+                                        <Label>Street</Label>
+                                        <Input 
+                                            {...registerAddress('street')}
+                                            className="mb-3" 
+                                            placeholder="Street" 
+                                            type="text" 
+                                            disabled
+                                        />
+                                    </div>
                                 </div>
-                                <div className="flex flex-col w-full">
-                                    <Label>Street</Label>
-                                    <Input 
-                                        {...registerAddress('street')}
-                                        className="mb-3" 
-                                        placeholder="Street" 
-                                        type="text" 
-                                        disabled
-                                    />
+                                <div className="flex gap-2">
+                                    <div className="flex flex-col w-full">
+                                        <Label>District</Label>
+                                        <Input 
+                                            {...registerAddress('district')}
+                                            className="mb-3" 
+                                            placeholder="District" 
+                                            type="text" 
+                                            disabled
+                                        />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <Label>State</Label>
+                                        <Input 
+                                            {...registerAddress('state')}
+                                            className="mb-3" 
+                                            placeholder="State" 
+                                            type="text" 
+                                            disabled
+                                        />
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="flex gap-2">
-                                <div className="flex flex-col w-full">
-                                    <Label>District</Label>
-                                    <Input 
-                                        {...registerAddress('district')}
-                                        className="mb-3" 
-                                        placeholder="District" 
-                                        type="text" 
-                                        disabled
-                                    />
+                                <div className="flex gap-2">
+                                    <div className="flex flex-col">
+                                        <Label>Number</Label>
+                                        <Input 
+                                            {...registerAddress('number')}
+                                            className="mb-3" 
+                                            placeholder="Number" 
+                                            type="text" 
+                                        />
+                                    </div>
+                                    <div className="flex flex-col w-full">
+                                        <Label>Complement</Label>
+                                        <Input 
+                                            {...registerAddress('complement')}
+                                            className="mb-3" 
+                                            placeholder="Complement" 
+                                            type="text" 
+                                        />
+                                    </div>
                                 </div>
-                                <div className="flex flex-col">
-                                    <Label>State</Label>
-                                    <Input 
-                                        {...registerAddress('state')}
-                                        className="mb-3" 
-                                        placeholder="State" 
-                                        type="text" 
-                                        disabled
-                                    />
-                                </div>
-                            </div>
-                            <div className="flex gap-2">
-                                <div className="flex flex-col">
-                                    <Label>Number</Label>
-                                    <Input 
-                                        {...registerAddress('number')}
-                                        className="mb-3" 
-                                        placeholder="Number" 
-                                        type="text" 
-                                    />
-                                </div>
-                                <div className="flex flex-col w-full">
-                                    <Label>Complement</Label>
-                                    <Input 
-                                        {...registerAddress('complement')}
-                                        className="mb-3" 
-                                        placeholder="Complement" 
-                                        type="text" 
-                                    />
-                                </div>
-                            </div>
-                            <Button type="submit" className="cursor-pointer w-full my-2">
-                                Next step
-                            </Button>
-                        </form>
+                                <Button type="submit" className="cursor-pointer w-full my-2">
+                                    Submit
+                                </Button>
+                            </form>
+                        )}
+                        {registerStep === 'phone' && (
+                            <motion.form
+                                onSubmit={handleSubmitPhone(phoneSubmit)}
+                                initial={{opacity: 0}} 
+                                animate={{opacity: 1}} 
+                                transition={{duration: 1}}
+                                className="w-full"
+                            >
+                                <h2 className="text-xl text-cyan-700 font-semibold mb-2">The Phone</h2>
+                                <p className="mb-4">
+                                    The phone is essential to us, he allow us to notify you here is your pet 
+                                    and if he is lost, if someone find him and scan his collar you be notified on whatsapp
+                                </p>
+                                <Label>Phone number</Label>
+                                <Input
+                                    {...registerPhone('number')}
+                                    className="mb-3"
+                                    placeholder="5512345678909"
+                                    type="text"
+                                />
+                                <Button type="submit" className="cursor-pointer w-full my-2">
+                                    Submit
+                                </Button>
+                            </motion.form>
+                        )}
                     </div>
                 </motion.div>
             </div>
