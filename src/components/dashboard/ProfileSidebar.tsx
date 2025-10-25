@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { MapPin, Phone, Mail, PawPrint } from "lucide-react";
 import { useAuth } from "@/providers/UserProvider";
 import { SheetDemo } from "../dashboard/editprofile";
+import { formatPhone } from "@/lib/formatter";
 
 
 
@@ -33,15 +34,16 @@ export default function ProfileSidebar() {
       {/* Conteúdo */}
       <CardContent className="space-y-4">
         <div className="flex items-start gap-2 text-sm text-slate-700 dark:text-slate-200">
-          <MapPin className="h-4 w-4 mt-0.5 text-cyan-600 dark:text-cyan-400" />
-          <span>Fatec Cruzeiro</span>
+          <MapPin className="min-h-4 min-w-4 mt-0.5 text-cyan-600 dark:text-cyan-400" />
+          <span>{user?.address.street}, {user?.address.number}, {user?.address.district}, {user?.address.city}, {user?.address.state}</span>
         </div>
 
-        <div className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-200">
-          <Phone className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
-          <span>(11) 1111-1111</span>
-        </div>
-
+        {user?.phones.map((phone) => (
+          <div key={phone.id} className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-200">
+            <Phone className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
+            <span>{formatPhone(phone.number)}</span>
+          </div>
+        ))}
         <div className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-200">
           <Mail className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
           <span>{user?.email}</span>

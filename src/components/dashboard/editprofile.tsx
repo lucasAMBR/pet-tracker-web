@@ -16,9 +16,9 @@ export function SheetDemo() {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="outline">Editar Perfil</Button>
+        <Button variant="default" className="w-full cursor-pointer">Editar Perfil</Button>
       </SheetTrigger>
-      <SheetContent>
+      <SheetContent className="p-4 min-w-[550px]">
         <SheetHeader>
           <SheetTitle>Editar Perfil</SheetTitle>
           <SheetDescription>
@@ -26,51 +26,38 @@ export function SheetDemo() {
             terminar.
           </SheetDescription>
         </SheetHeader>
-
-        <div className="grid flex-1 auto-rows-min gap-6 px-4">
-          <Label htmlFor="sheet-demo-username"> Foto de Perfil</Label>
-
-          <div className="flex justify-center">
-            <Input id="sheet-demo-username" type="file" accept="image/*" className="hidden" />
-            <Label
-              htmlFor="sheet-demo-username"
-              className="h-16 w-16 rounded-full border border-dashed border-neutral-400 dark:border-neutral-600 flex items-center justify-center cursor-pointer text-xs select-none">
-              Upload
-            </Label>
-          </div>
-        </div>
-
-        <div className="grid flex-1 auto-rows-min gap-6 px-4">
-          <div className="grid gap-3">
-            <Label htmlFor="sheet-demo-username">Nome</Label>
+        
+        <div className="flex-1 auto-rows-min gap-6 px-4">
+          <div className="my-6 gap-3">
+            <Label htmlFor="sheet-demo-username" className="mb-2">Nome</Label>
             <Input id="sheet-demo-username" defaultValue="Insira aqui" />
           </div>
 
-          <div className="grid gap-3">
-            <Label htmlFor="sheet-demo-username">Bio</Label>
+          <div className="my-6 gap-3">
+            <Label htmlFor="sheet-demo-username" className="mb-2">Bio</Label>
             <Input id="ssheet-demo-username" defaultValue="Bio qualquer" />
           </div>
 
-          <div className="grid gap-3">
-            <Label htmlFor="sheet-demo-username">Localização</Label>
+          <div className="my-6 gap-3">
+            <Label htmlFor="sheet-demo-username" className="mb-2">Localização</Label>
             <Input id="sheet-demo-username" defaultValue="Fatec Cruzeiro" />
           </div>
 
-          <div className="grid gap-3">
-            <Label htmlFor="sheet-demo-username">Telefone</Label>
+          <div className="my-6 gap-3">
+            <Label htmlFor="sheet-demo-username" className="mb-2">Telefone</Label>
             <Input id="sheet-demo-username" defaultValue="(11) 1111-1111" />
           </div>
 
-          <div className="grid gap-3">
-            <Label htmlFor="sheet-demo-username">Email</Label>
+          <div className="my-6 gap-3">
+            <Label htmlFor="sheet-demo-username" className="mb-2">Email</Label>
             <Input id="sheet-demo-username" defaultValue="exemplo@email.com" />
           </div>
         </div>
 
         <SheetFooter>
-          <Button type="submit">Salvar Alterações</Button>
+          <Button type="submit" className="cursor-pointer">Salvar Alterações</Button>
           <SheetClose asChild>
-            <Button variant="outline">Fechar</Button>
+            <Button variant="outline" className="cursor-pointer">Fechar</Button>
           </SheetClose>
         </SheetFooter>
       </SheetContent>
