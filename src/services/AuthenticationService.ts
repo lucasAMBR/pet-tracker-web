@@ -14,7 +14,24 @@ const registerNewUser = async (
 			...userData,
 			birthday: format(userData.birthday, "yyyy-MM-dd"),
 		};
-		const response = await api.post("/auth/register", payload);
+
+		const formData = new FormData();
+
+		formData.append('name', userData.name);
+		formData.append('email', userData.email);
+		formData.append('password', userData.password);
+		formData.append('cpf', userData.cpf);
+		formData.append('birthday', payload.birthday);
+
+        if (userData.image && userData.image.length > 0) {
+            formData.append('image', userData.image[0]);
+        }
+
+		const response = await api.post("/auth/register", formData, {
+			headers: {
+				"Content-Type": "multipart/form-data"
+			}
+		});
 		return response.data;
 	} catch (error) {
 		throw error;
@@ -35,7 +52,18 @@ const login = async (
 	}
 };
 
+const refetchUserData = async(): Promise<ApiResponse<User>> => {
+	try {
+		const response = await api.post("/users/me")
+
+		return response.data;
+	} catch (error) {
+		throw error;
+	}
+}
+
 export const authenticationService = {
 	registerNewUser,
 	login,
+	refetchUserData
 };

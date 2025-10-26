@@ -13,6 +13,16 @@ const RegisterAddress = async(
     }
 }
 
+const GetLoggedUserAddress = async(): Promise<ApiResponse<Address>> => {
+    try{
+        const response = await api.get('/addresses');
+        return response.data;
+    }catch(error){
+        throw error;
+    }
+}
+
 export const addressService = {
-    RegisterAddress
+    RegisterAddress,
+    GetLoggedUserAddress
 } 

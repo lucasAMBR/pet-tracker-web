@@ -8,6 +8,5 @@ export type User = {
 	updated_at: Date;
 	has_address: boolean;
 	has_phone: boolean;
-	address: Address;
-	phones: Phone[];
+	image: string;
 };

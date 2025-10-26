@@ -8,19 +8,33 @@ import { MapPin, Phone, Mail, PawPrint } from "lucide-react";
 import { useAuth } from "@/providers/UserProvider";
 import { SheetDemo } from "../dashboard/editprofile";
 import { formatPhone } from "@/lib/formatter";
+import { useLoggedUserPhones } from "@/hooks/Phone/useLoggedUserPhone";
+import { useLoggedUserAddress } from "@/hooks/Address/useLoggedUserAddress";
 
 
 
 export default function ProfileSidebar() {
 
   const { user } = useAuth();
+
+  const {
+    data: loggedUserPhones,
+    isFetching: phonesIsFetching,
+    error: phonesError
+  } = useLoggedUserPhones();
+
+  const {
+    data: loggedUserAddress,
+    isFetching: addressIsFetching,
+    error: addressError
+  } = useLoggedUserAddress();
    
   return (
     <Card className="rounded-md bg-white shadow-md hover:shadow-lg transition dark:bg-neutral-800 dark:shadow-black/10">
       <CardHeader className="flex flex-col items-center">
-        <Avatar className="h-28 w-28 ring-2 ring-white dark:ring-neutral-800">
-          <AvatarImage src="/images/profile.png" alt={user?.name} />
-          <AvatarFallback>Kaua</AvatarFallback>{/* Só aparece se n tiver imagem */}
+        <Avatar className="h-28 w-28 hover:ring-cyan-500 ring-none hover:ring-4 cursor-pointer hover:brightness-70 transition-all delay-100">
+          <AvatarImage src={`${process.env.NEXT_PUBLIC_BACKEND_URL}storage/${user?.image}`} alt={user?.name} />
+          <AvatarFallback>{user?.name} profile pic</AvatarFallback>
         </Avatar>
 
         <CardTitle className="mt-3 text-xl text-slate-900 dark:text-slate-100">
@@ -31,19 +45,27 @@ export default function ProfileSidebar() {
         </p>
       </CardHeader>
 
-      {/* Conteúdo */}
       <CardContent className="space-y-4">
         <div className="flex items-start gap-2 text-sm text-slate-700 dark:text-slate-200">
           <MapPin className="min-h-4 min-w-4 mt-0.5 text-cyan-600 dark:text-cyan-400" />
-          <span>{user?.address.street}, {user?.address.number}, {user?.address.district}, {user?.address.city}, {user?.address.state}</span>
+          {addressIsFetching &&
+            <span>loading address...</span>
+          }
+          {!addressIsFetching && !addressError &&
+            <span>{loggedUserAddress?.data.street}, {loggedUserAddress?.data.district}, {loggedUserAddress?.data.number}, {loggedUserAddress?.data.city} - {loggedUserAddress?.data.state}</span>
+          }
+          <span></span>
         </div>
-
-        {user?.phones.map((phone) => (
-          <div key={phone.id} className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-200">
-            <Phone className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
-            <span>{formatPhone(phone.number)}</span>
-          </div>
-        ))}
+        {!phonesIsFetching && !phonesError &&
+          <>
+            {loggedUserPhones?.data.map((phone) => (
+              <div key={phone.id} className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-200">
+                <Phone className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
+                <span>{formatPhone(phone.number)}</span>
+              </div>
+            ))}
+          </>
+        }
         <div className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-200">
           <Mail className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
           <span>{user?.email}</span>
@@ -58,8 +80,8 @@ export default function ProfileSidebar() {
           </span>
         </div>
         
-<div className="mt-2">
-          <SheetDemo />
+        <div className="mt-2">
+            <SheetDemo />
         </div>
       </CardContent>
     </Card>

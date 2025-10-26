@@ -13,6 +13,16 @@ const RegisterPhone = async(
     }
 }
 
+const GetLoggedUserPhone = async(): Promise<ApiResponse<Phone[]>> => {
+    try{
+        const response = await api.get('/phones');
+        return response.data;
+    }catch (error){
+        throw error;
+    }
+}
+
 export const phoneService = {
-    RegisterPhone
+    RegisterPhone,
+    GetLoggedUserPhone
 }

@@ -4,6 +4,11 @@ import TopSearch from "../../../components/dashboard/topsearch";
 import ProfileSidebar from "../../../components/dashboard/ProfileSidebar";
 import PetGrid from "../../../components/dashboard/PetGrid";
 import CareTips from "../../../components/dashboard/CareTips";
+import { useRefetchUserData } from "@/hooks/Authentication/useRefetchUserData";
+import { Spinner } from "@/components/ui/spinner";
+import { useEffect, useState } from "react";
+import { useAuth } from "@/providers/UserProvider";
+import { api } from "@/lib/axios";
 
 export type PillTone = "blue" | "green" | "pink";
 export type Pet = {
@@ -26,6 +31,7 @@ export type Pet = {
 };
 
 export default function Page() {
+
   const petBase: Pet = {
     id: "1",
     name: "Dogan",
@@ -59,7 +65,6 @@ for (let i = 0; i < 6; i++) {
 
   pets.push(newPet);
 }
-
 
   return (
     <div className="min-h-screen ...">
