@@ -17,7 +17,6 @@ import ErrorBox from "@/components/global/error-advertise";
 import { toast } from "sonner";
 import { useRegisterPhone } from "@/hooks/Phone/useRegisterPhone";
 import { RegisterPhoneSchema, RegisterPhoneSchemaType } from "@/schemas/phones/RegisterPhoneSchema";
-import { useRefetchUserData } from "@/hooks/Authentication/useRefetchUserData";
 import { api } from "@/lib/axios";
 import { flushSync } from "react-dom";
 

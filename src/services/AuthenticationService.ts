@@ -1,6 +1,7 @@
 import { api } from "@/lib/axios";
 import { LoginFormSchemaType } from "@/schemas/login/LoginFormSchema";
 import { RegisterFormSchemaType } from "@/schemas/register/RegisterFormSchema";
+import { UpdateUserSchemaType } from "@/schemas/user/UpdateUserSchema";
 import { ApiResponse } from "@/types/ApiResponse";
 import { LoginResponse } from "@/types/LoginResponse/LoginResponse";
 import { User } from "@/types/User/User";
@@ -54,9 +55,41 @@ const login = async (
 
 const refetchUserData = async(): Promise<ApiResponse<User>> => {
 	try {
-		const response = await api.post("/users/me")
+		const response = await api.get("/users/me")
 
 		return response.data;
+	} catch (error) {
+		throw error;
+	}
+}
+
+const updateUserData = async(
+	updateData: UpdateUserSchemaType
+):Promise<ApiResponse<User>> => {
+	try{
+		const formData = new FormData();
+
+        Object.keys(updateData).forEach(key => {
+            const value = updateData[key as keyof typeof updateData];
+
+            if (key === 'image') {
+                if (value && (value as FileList).length > 0) {
+                    formData.append('image', (value as FileList)[0]);
+                }
+			}
+
+            else if (value !== undefined && value !== null) {
+                formData.append(key, value as string);
+            }
+        });
+
+        const response = await api.post("/users/update", formData, {
+            headers: {
+                "Content-Type": "multipart/form-data"
+            }
+        });
+
+        return response.data;
 	} catch (error) {
 		throw error;
 	}
@@ -65,5 +98,6 @@ const refetchUserData = async(): Promise<ApiResponse<User>> => {
 export const authenticationService = {
 	registerNewUser,
 	login,
-	refetchUserData
+	refetchUserData,
+	updateUserData
 };

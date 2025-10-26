@@ -4,7 +4,6 @@ import TopSearch from "../../../components/dashboard/topsearch";
 import ProfileSidebar from "../../../components/dashboard/ProfileSidebar";
 import PetGrid from "../../../components/dashboard/PetGrid";
 import CareTips from "../../../components/dashboard/CareTips";
-import { useRefetchUserData } from "@/hooks/Authentication/useRefetchUserData";
 import { Spinner } from "@/components/ui/spinner";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/providers/UserProvider";

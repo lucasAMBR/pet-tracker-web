@@ -11,35 +11,117 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { DatepickerInput } from "../ui/date-input";
-import { useForm } from "react-hook-form";
-import { RegisterFormSchema, RegisterFormSchemaType } from "@/schemas/register/RegisterFormSchema";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useAuth } from "@/providers/UserProvider";
 import { Accordion } from "@radix-ui/react-accordion";
 import { AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion";
 import { useLoggedUserPhones } from "@/hooks/Phone/useLoggedUserPhone";
 import { useLoggedUserAddress } from "@/hooks/Address/useLoggedUserAddress";
 import { Spinner } from "../ui/spinner";
+import { useLoggedUserProfile } from "@/hooks/Authentication/useRefetchUserData";
+import { useUpdateUserData } from "@/hooks/Authentication/useUpdateUserData";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { UpdateUserSchema, UpdateUserSchemaType } from "@/schemas/user/UpdateUserSchema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
+import ErrorBox from "../global/error-advertise";
+import axios from "axios";
+import { ApiResponse } from "@/types/ApiResponse";
+import { useState } from "react";
 
 export function SheetDemo() {
-  
-    const {
-      user
-    } = useAuth();
 
-    const {
-      data: loggedUserPhones,
-      isFetching: phonesIsFetching,
-      error: phonesError
-    } = useLoggedUserPhones();
-  
-    const {
-      data: loggedUserAddress,
-      isFetching: addressIsFetching,
-      error: addressError
-    } = useLoggedUserAddress();
-  
+  const queryClient = useQueryClient();
+
+  const { 
+    data: loggedUserProfile,
+    isFetching: UserProfileIsFetching,
+    error: userProfileError
+    } = useLoggedUserProfile();
+
+  const {
+    data: loggedUserPhones,
+    isFetching: phonesIsFetching,
+    error: phonesError
+  } = useLoggedUserPhones();
+
+  const {
+    data: loggedUserAddress,
+    isFetching: addressIsFetching,
+    error: addressError
+  } = useLoggedUserAddress();
+
+  const {
+    mutateAsync: updateUserData,
+    isPending: userUpdateIsPending,
+    error: updateUserError
+  } = useUpdateUserData();
+
+  const {
+    register: registerUpdateData,
+    handleSubmit: handleSubmitUserUpdate,
+    formState: {errors: userUpdatedErrors, isSubmitting: userUpdateIsSubmitting},
+    reset
+  } = useForm<UpdateUserSchemaType>({
+    resolver: zodResolver(UpdateUserSchema)
+  })
+
+  const [apiValidationErrors, setApiValidationErrors] =
+    useState<ValidationErrors | null>();
+
+  const sendUserUpdateToApi: SubmitHandler<UpdateUserSchemaType> = async (formData) => {
+    
+    const changedData: Partial<UpdateUserSchemaType> = {};
+
+    const textFields: Array<'name' | 'email' | 'cpf'> = ['name', 'email', 'cpf']; 
+
+    textFields.forEach(key => {
+        const newValue = formData[key];
+
+        const oldValue = loggedUserProfile?.data?.[key]; 
+
+        if (newValue !== oldValue) {
+            changedData[key] = newValue;
+        }
+    });
+
+    if (formData.image && formData.image.length > 0) {
+        changedData.image = formData.image;
+    }
+
+    if (Object.keys(changedData).length === 0) {
+        toast.info("Nenhuma alteração detectada.");
+        return;
+    }
+
+    try {
+        const newUserData = await updateUserData(changedData as UpdateUserSchemaType, {
+            onSuccess: () => {
+                queryClient.invalidateQueries({
+                    queryKey: ['loggedUserProfile']
+                });
+            }
+        });
+
+        if (!newUserData.success) {
+				  throw new Error(newUserData.message);
+			  }
+
+        toast.success(newUserData.message);
+
+        reset();
+    } catch (errors: any) {
+			if (axios.isAxiosError<ApiResponse<ValidationErrors>>(errors)) {
+				const errorMessage = errors.response?.data?.message || errors.message;
+				if (errors.status == 422) {
+					setApiValidationErrors(errors.response?.data.data);
+				}
+
+				toast.error(errorMessage);
+			} else {
+				toast.error(errors.message);
+			}
+		}
+  }
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -48,35 +130,59 @@ export function SheetDemo() {
       <SheetContent className="p-4 min-w-[550px]">
         <SheetHeader>
           <SheetTitle>Edit your personal information</SheetTitle>
-
         </SheetHeader>
         
         <Accordion type="single" collapsible className="w-full p-4">
           <AccordionItem value="profile-infos">
             <AccordionTrigger>Edit your profile data</AccordionTrigger>
             <AccordionContent className="p-1">
-              <form className="flex-1 auto-rows-min gap-6">
-                <div className="my-3 gap-3">
-                  <Label className="mb-2">Profile Pic</Label>
-                  <Input type="file"/>
-                </div>
+              {UserProfileIsFetching && (
+                <Spinner />
+              )}
+              {!UserProfileIsFetching && !userProfileError && (
+                <form onSubmit={handleSubmitUserUpdate(sendUserUpdateToApi)} className="flex-1 auto-rows-min gap-6">
+                  <ErrorBox errors={userUpdatedErrors} apiErrors={apiValidationErrors}/>
+                  <div className="my-3 gap-3">
+                    <Label className="mb-2">Profile Pic</Label>
+                    <Input 
+                      {...registerUpdateData('image')}
+                      type="file"
+                      id="profile-pic"
+                    />
+                  </div>
 
-                <div className="my-3 gap-3">
-                  <Label className="mb-2">Name</Label>
-                  <Input defaultValue={user?.name} />
-                </div>
+                  <div className="my-3 gap-3">
+                    <Label className="mb-2">Name</Label>
+                    <Input 
+                      {...registerUpdateData('name')} 
+                      type="text"
+                      id="name"
+                      defaultValue={loggedUserProfile?.data.name}
+                    />
+                  </div>
 
-                <div className="my-3 gap-3">
-                  <Label className="mb-2">E-mail</Label>
-                  <Input defaultValue={user?.email} />
-                </div>
+                  <div className="my-3 gap-3">
+                    <Label className="mb-2">E-mail</Label>
+                    <Input 
+                      {...registerUpdateData('email')}
+                      type="email"
+                      id="email"
+                      defaultValue={loggedUserProfile?.data.email}
+                    />
+                  </div>
 
-                <div className="my-3 gap-3">
-                  <Label htmlFor="sheet-demo-username" className="mb-2">CPF</Label>
-                  <Input defaultValue={user?.cpf} />
-                </div>
-                <Button type="submit" variant={"default"} className="w-full my-3">Edit</Button>
-              </form>
+                  <div className="my-3 gap-3">
+                    <Label htmlFor="sheet-demo-username" className="mb-2">CPF</Label>
+                    <Input 
+                      {...registerUpdateData('cpf')}
+                      type="text"
+                      id="cpf"
+                      defaultValue={loggedUserProfile?.data.cpf}
+                    />
+                  </div>
+                  <Button type="submit" variant={"default"} className="w-full my-3">Edit</Button>
+                </form>
+              )}
             </AccordionContent>
           </AccordionItem>
           <hr />
@@ -192,24 +298,27 @@ export function SheetDemo() {
             <AccordionContent className="p-1">
                 <form>
                   <div className="flex flex-col w-full gap-2">
-                    <Label>Actual passowrd</Label>
+                    <Label>Actual password</Label>
                     <Input 
                       className="mb-3"  
                       type="text" 
+                      placeholder="Insert here..."
                     />
                   </div>
                   <div className="flex flex-col w-full gap-2">
-                    <Label>New passowrd</Label>
+                    <Label>New password</Label>
                     <Input 
                       className="mb-3" 
                       type="text" 
+                      placeholder="Insert here..."
                     />
                   </div>
                   <div className="flex flex-col w-full gap-2">
-                    <Label>Confirm new passowrd</Label>
+                    <Label>Confirm new password</Label>
                     <Input 
                       className="mb-3" 
                       type="text" 
+                      placeholder="Insert here..."
                     />
                   </div>
                   <Button type="submit" variant={"default"} className="w-full">Change</Button>
@@ -220,7 +329,7 @@ export function SheetDemo() {
 
         <SheetFooter>
           <SheetClose asChild>
-            <Button variant="outline" className="cursor-pointer">Fechar</Button>
+            <Button variant="outline" className="cursor-pointer">Close</Button>
           </SheetClose>
         </SheetFooter>
       </SheetContent>

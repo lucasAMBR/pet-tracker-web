@@ -10,12 +10,15 @@ import { SheetDemo } from "../dashboard/editprofile";
 import { formatPhone } from "@/lib/formatter";
 import { useLoggedUserPhones } from "@/hooks/Phone/useLoggedUserPhone";
 import { useLoggedUserAddress } from "@/hooks/Address/useLoggedUserAddress";
-
-
+import { useLoggedUserProfile } from "@/hooks/Authentication/useRefetchUserData";
 
 export default function ProfileSidebar() {
 
-  const { user } = useAuth();
+  const { 
+    data: loggedUserProfile,
+    isFetching: UserProfileIsFetching,
+    error: userProfileError
+   } = useLoggedUserProfile();
 
   const {
     data: loggedUserPhones,
@@ -28,17 +31,17 @@ export default function ProfileSidebar() {
     isFetching: addressIsFetching,
     error: addressError
   } = useLoggedUserAddress();
-   
+
   return (
     <Card className="rounded-md bg-white shadow-md hover:shadow-lg transition dark:bg-neutral-800 dark:shadow-black/10">
       <CardHeader className="flex flex-col items-center">
         <Avatar className="h-28 w-28 hover:ring-cyan-500 ring-none hover:ring-4 cursor-pointer hover:brightness-70 transition-all delay-100">
-          <AvatarImage src={`${process.env.NEXT_PUBLIC_BACKEND_URL}storage/${user?.image}`} alt={user?.name} />
-          <AvatarFallback>{user?.name} profile pic</AvatarFallback>
+          <AvatarImage src={`${process.env.NEXT_PUBLIC_BACKEND_URL}storage/${loggedUserProfile?.data.image}`} alt={loggedUserProfile?.data.name} />
+          <AvatarFallback>{loggedUserProfile?.data.name} profile pic</AvatarFallback>
         </Avatar>
 
         <CardTitle className="mt-3 text-xl text-slate-900 dark:text-slate-100">
-          {user?.name}
+            <p>{loggedUserProfile?.data.name}</p>
         </CardTitle>
         <p className="mt-1 text-center text-sm text-slate-600 dark:text-slate-300 max-w-[240px]">
           Bio qualquer
@@ -68,7 +71,7 @@ export default function ProfileSidebar() {
         }
         <div className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-200">
           <Mail className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
-          <span>{user?.email}</span>
+          <span>{loggedUserProfile?.data.email}</span>
         </div>
 
         <Separator className="dark:bg-neutral-700" />

@@ -1,8 +1,9 @@
 import { authenticationService } from "@/services/AuthenticationService";
-import { useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
-export const useRefetchUserData = () => {
-	return useMutation({
-		mutationFn: authenticationService.refetchUserData,
-	});
+export const useLoggedUserProfile = () => {
+	return useQuery({
+        queryKey: ['loggedUserProfile'],
+        queryFn: authenticationService.refetchUserData
+    });
 };
