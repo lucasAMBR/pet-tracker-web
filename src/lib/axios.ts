@@ -28,7 +28,7 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    if (error.response?.status === 401 && !error.config?._skipAuthRedirect) {
       console.log('Authentication error (401). Redirecting to login.');
       localStorage.removeItem('@tracker_token');
 

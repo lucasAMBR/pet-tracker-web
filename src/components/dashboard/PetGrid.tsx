@@ -13,9 +13,11 @@ export default function PetGrid({ pets }: PetGridProps) {
   }
 
   return (
-    <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+    <div className="flex flex-wrap -m-3 mb-4">
       {pets.map((pet) => (
-        <PetCard key={pet.id} pet={pet} />
+        <div key={pet.id} className="w-full sm:w-1/2 xl:w-1/3 p-3">
+          <PetCard key={pet.id} pet={pet} />
+        </div>
       ))}
     </div>
   );

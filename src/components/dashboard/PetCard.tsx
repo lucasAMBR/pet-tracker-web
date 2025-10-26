@@ -36,7 +36,7 @@ export default function PetCard({ pet }: { pet: Pet }) {
         : Math.min(100, Math.max(0, Math.round(((windowDays - d) / windowDays) * 100)))
       : 0;
   return (
-    <Card className="rounded-2xl bg-white shadow-md hover:shadow-lg transition overflow-hidden dark:bg-neutral-800 dark:shadow-black/10">
+    <Card className="rounded-md bg-white shadow-md hover:shadow-lg transition overflow-hidden dark:bg-neutral-800 dark:shadow-black/10">
       {/* Capa */}
       <div className="relative w-full h-40">
         <Image src={pet.headerImage} alt={pet.name} fill className="object-cover h-full" priority />
@@ -82,7 +82,7 @@ export default function PetCard({ pet }: { pet: Pet }) {
         </div>
 
         {/* infos */}
-        <div className="mt-3 grid gap-2 text-sm text-slate-700 dark:text-slate-200">
+        <div className="mt-3 flex flex-col gap-2 text-sm text-slate-700 dark:text-slate-200">
           <div className="flex justify-between">
             <div className="flex gap-2 items-center">
               <Syringe className="h-4 w-4 text-green-600 dark:text-green-400" />

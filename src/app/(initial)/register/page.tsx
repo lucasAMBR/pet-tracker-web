@@ -145,6 +145,16 @@ const RegisterPage = () => {
 						value={date}
 						onChange={(date) => setValue("birthday", date as Date)}
 					/>
+					<div className="">
+						<Label className="mb-2">Profile picture</Label>
+						<Input
+							{...register('image')}
+							type="file"
+							id="profile picture"
+							placeholder="Password"
+							className="w-full"
+						/>
+					</div>
 					<div className="flex items-start gap-3 my-4">
 						<Controller
 							name="terms"
