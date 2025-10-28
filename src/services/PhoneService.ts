@@ -1,5 +1,6 @@
 import { api } from "@/lib/axios"
 import { RegisterPhoneSchemaType } from "@/schemas/phones/RegisterPhoneSchema"
+import { UpdatePhoneSchemaType } from "@/schemas/phones/UpdatePhoneSchema";
 import { ApiResponse } from "@/types/ApiResponse"
 
 const RegisterPhone = async(
@@ -22,7 +23,19 @@ const GetLoggedUserPhone = async(): Promise<ApiResponse<Phone[]>> => {
     }
 }
 
+const UpdateUserPhones = async(
+    phoneList: UpdatePhoneSchemaType
+) => {
+        try{
+        const response = await api.put('/phones/update-phones', phoneList);
+        return response.data;
+    }catch (error){
+        throw error;
+    }
+}
+
 export const phoneService = {
     RegisterPhone,
-    GetLoggedUserPhone
+    GetLoggedUserPhone,
+    UpdateUserPhones
 }

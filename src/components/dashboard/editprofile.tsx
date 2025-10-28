@@ -225,7 +225,7 @@ export function SheetDemo() {
                       defaultValue={loggedUserProfile?.data.cpf}
                     />
                   </div>
-                  <Button type="submit" variant={"default"} className="w-full my-3">Edit</Button>
+                  <Button type="submit" variant={"default"} className="w-full my-3">{userUpdateIsSubmitting ? "Updating..." : "Edit"}Edit</Button>
                 </form>
               )}
             </AccordionContent>
