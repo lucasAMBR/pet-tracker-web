@@ -37,7 +37,7 @@ export default function ProfileSidebar() {
       <CardHeader className="flex flex-col items-center">
         <Avatar className="h-28 w-28 hover:ring-cyan-500 ring-none hover:ring-4 cursor-pointer hover:brightness-70 transition-all delay-100">
           <AvatarImage src={`${process.env.NEXT_PUBLIC_BACKEND_URL}storage/${loggedUserProfile?.data.image}`} alt={loggedUserProfile?.data.name} />
-          <AvatarFallback>{loggedUserProfile?.data.name} profile pic</AvatarFallback>
+          <AvatarFallback className="bg-cyan-600 text-4xl font-bold">{loggedUserProfile?.data.name.charAt(0)}</AvatarFallback>
         </Avatar>
 
         <CardTitle className="mt-3 text-xl text-slate-900 dark:text-slate-100">

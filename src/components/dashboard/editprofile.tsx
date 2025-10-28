@@ -27,6 +27,8 @@ import ErrorBox from "../global/error-advertise";
 import axios from "axios";
 import { ApiResponse } from "@/types/ApiResponse";
 import { useState } from "react";
+import { usePasswordChange } from "@/hooks/Authentication/usePasswordChange";
+import { ChangePasswordSchema, ChangePasswordSchemaType } from "@/schemas/user/ChangePasswordSchema";
 
 export function SheetDemo() {
 
@@ -60,13 +62,30 @@ export function SheetDemo() {
     register: registerUpdateData,
     handleSubmit: handleSubmitUserUpdate,
     formState: {errors: userUpdatedErrors, isSubmitting: userUpdateIsSubmitting},
-    reset
+    reset: resetUpdateUserForm
   } = useForm<UpdateUserSchemaType>({
     resolver: zodResolver(UpdateUserSchema)
   })
 
-  const [apiValidationErrors, setApiValidationErrors] =
+  const {
+    mutateAsync: passwordChange,
+    isPending: passwordChangeIsPending,
+    error: passwordChangeError
+  } = usePasswordChange();
+
+  const {
+    register: registerPasswordChange,
+    handleSubmit: handleSubmitPasswordChange,
+    formState: {errors: passwordChangeFormErrors, isSubmitting: passwordChangeIsSubmitting},
+    reset: resetPasswordChangeForm
+  } = useForm<ChangePasswordSchemaType>({
+    resolver: zodResolver(ChangePasswordSchema)
+  })
+
+  const [updateUserApiValidationErrors, setUpdateUserApiValidationErrors] =
     useState<ValidationErrors | null>();
+
+  const [passwordChangeApiValidationErrors, setPasswordChangeApiValidationError] = useState<ValidationErrors | null>();
 
   const sendUserUpdateToApi: SubmitHandler<UpdateUserSchemaType> = async (formData) => {
     
@@ -108,12 +127,12 @@ export function SheetDemo() {
 
         toast.success(newUserData.message);
 
-        reset();
+        resetUpdateUserForm();
     } catch (errors: any) {
 			if (axios.isAxiosError<ApiResponse<ValidationErrors>>(errors)) {
 				const errorMessage = errors.response?.data?.message || errors.message;
 				if (errors.status == 422) {
-					setApiValidationErrors(errors.response?.data.data);
+					setUpdateUserApiValidationErrors(errors.response?.data.data);
 				}
 
 				toast.error(errorMessage);
@@ -122,6 +141,32 @@ export function SheetDemo() {
 			}
 		}
   }
+
+  const sendPasswordChangeToApi: SubmitHandler<ChangePasswordSchemaType> = async(data) => {
+    setPasswordChangeApiValidationError(undefined);
+    try{
+      const response = await passwordChange(data);
+
+      if (!response.success) {
+				  throw new Error(response.message);
+			}
+
+      toast.success(response.message);
+      resetPasswordChangeForm();
+    }catch(error: any){
+      if (axios.isAxiosError<ApiResponse<ValidationErrors>>(error)) {
+				const errorMessage = error.response?.data?.message || error.message;
+				if (error.status == 422) {
+					setPasswordChangeApiValidationError(error.response?.data.data);
+				}
+
+				toast.error(errorMessage);
+			} else {
+				toast.error(error.message);
+			}
+    }
+  }
+
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -141,7 +186,7 @@ export function SheetDemo() {
               )}
               {!UserProfileIsFetching && !userProfileError && (
                 <form onSubmit={handleSubmitUserUpdate(sendUserUpdateToApi)} className="flex-1 auto-rows-min gap-6">
-                  <ErrorBox errors={userUpdatedErrors} apiErrors={apiValidationErrors}/>
+                  <ErrorBox errors={userUpdatedErrors} apiErrors={updateUserApiValidationErrors}/>
                   <div className="my-3 gap-3">
                     <Label className="mb-2">Profile Pic</Label>
                     <Input 
@@ -296,28 +341,32 @@ export function SheetDemo() {
           <AccordionItem value="password-infos">
             <AccordionTrigger>Password change</AccordionTrigger>
             <AccordionContent className="p-1">
-                <form>
-                  <div className="flex flex-col w-full gap-2">
+                <form onSubmit={handleSubmitPasswordChange(sendPasswordChangeToApi)}>
+                  <ErrorBox errors={passwordChangeFormErrors} apiErrors={passwordChangeApiValidationErrors}/>
+                  <div className="flex flex-col w-full gap-2 mt-4">
                     <Label>Actual password</Label>
-                    <Input 
+                    <Input
+                      {...registerPasswordChange('old_password')} 
                       className="mb-3"  
-                      type="text" 
+                      type="password" 
                       placeholder="Insert here..."
                     />
                   </div>
                   <div className="flex flex-col w-full gap-2">
                     <Label>New password</Label>
                     <Input 
+                      {...registerPasswordChange('new_password')}
                       className="mb-3" 
-                      type="text" 
+                      type="password" 
                       placeholder="Insert here..."
                     />
                   </div>
                   <div className="flex flex-col w-full gap-2">
                     <Label>Confirm new password</Label>
                     <Input 
+                      {...registerPasswordChange('new_password_confirmation')}
                       className="mb-3" 
-                      type="text" 
+                      type="password" 
                       placeholder="Insert here..."
                     />
                   </div>

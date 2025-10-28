@@ -1,6 +1,7 @@
 import { api } from "@/lib/axios";
 import { LoginFormSchemaType } from "@/schemas/login/LoginFormSchema";
 import { RegisterFormSchemaType } from "@/schemas/register/RegisterFormSchema";
+import { ChangePasswordSchemaType } from "@/schemas/user/ChangePasswordSchema";
 import { UpdateUserSchemaType } from "@/schemas/user/UpdateUserSchema";
 import { ApiResponse } from "@/types/ApiResponse";
 import { LoginResponse } from "@/types/LoginResponse/LoginResponse";
@@ -95,9 +96,22 @@ const updateUserData = async(
 	}
 }
 
+const changePassword = async(
+	updatedPassword: ChangePasswordSchemaType
+): Promise<ApiResponse<null>> => {
+	try{
+		const response = await api.patch("/auth/change-password", updatedPassword);
+
+		return response.data;
+	}catch(error){
+		throw error;
+	}
+}
+
 export const authenticationService = {
 	registerNewUser,
 	login,
 	refetchUserData,
-	updateUserData
+	updateUserData,
+	changePassword
 };
