@@ -25,7 +25,7 @@ import { toast } from "sonner";
 
 const LoginPage = () => {
 	const searchParams = useSearchParams();
-	
+
 	const router = useRouter();
 
 	const { login } = useAuth();
@@ -58,9 +58,9 @@ const LoginPage = () => {
 
 			login(apiResponse.data);
 
-			if(!loggedUser.has_address || !loggedUser.has_phone){
-				router.push("/missing-data")
-			}else{
+			if (!loggedUser.has_address || !loggedUser.has_phone) {
+				router.push("/missing-data");
+			} else {
 				router.push("/dashboard");
 			}
 		} catch (errors: any) {
@@ -73,17 +73,19 @@ const LoginPage = () => {
 		}
 	};
 
-	const [ notification, setNotification ] = useState<boolean>(false);
-	const [ notificationMessage, setNotificationMessage] = useState<string>("");
+	const [notification, setNotification] = useState<boolean>(false);
+	const [notificationMessage, setNotificationMessage] = useState<string>("");
 
 	useEffect(() => {
-		const reason = searchParams.get('reason');
+		const reason = searchParams.get("reason");
 
-		if(reason === 'session-expired'){
+		if (reason === "session-expired") {
 			setNotification(true);
-			setNotificationMessage("You have been logged out due to your access token expiring.");
+			setNotificationMessage(
+				"You have been logged out due to your access token expiring.",
+			);
 		}
-	}, [])
+	}, []);
 
 	return (
 		<div className="w-screen h-screen flex p-6 bg-neutral-100 dark:bg-neutral-900">

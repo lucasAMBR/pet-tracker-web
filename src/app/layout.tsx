@@ -37,11 +37,11 @@ export default function RootLayout({
 				<AuthProvider>
 					<NavigationProvider>
 						<ReactQueryProvider>
-							<NextThemeProvider 								
+							<NextThemeProvider
 								attribute="class"
-          						defaultTheme="system"
-          						enableSystem
-          						disableTransitionOnChange
+								defaultTheme="system"
+								enableSystem
+								disableTransitionOnChange
 							>
 								{children}
 								<ThemeToggle />

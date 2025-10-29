@@ -10,24 +10,24 @@ const NotFoundPage = () => {
 	return (
 		<div className="w-screen h-screen flex flex-col items-center justify-center">
 			<div className="dark:flex hidden">
-			<FuzzyText
-				baseIntensity={0.2}
-				hoverIntensity={0.4}
-				enableHover={true}
-				color={"#FFF"}
-			>
-				404
-			</FuzzyText>
+				<FuzzyText
+					baseIntensity={0.2}
+					hoverIntensity={0.4}
+					enableHover={true}
+					color={"#FFF"}
+				>
+					404
+				</FuzzyText>
 			</div>
 			<div className="flex dark:hidden">
-			<FuzzyText
-				baseIntensity={0.2}
-				hoverIntensity={0.4}
-				enableHover={true}
-				color={"#000"}
-			>
-				404
-			</FuzzyText>
+				<FuzzyText
+					baseIntensity={0.2}
+					hoverIntensity={0.4}
+					enableHover={true}
+					color={"#000"}
+				>
+					404
+				</FuzzyText>
 			</div>
 			<p className="text-4xl font-bold my-12 text-center">
 				It looks like the page you are <br /> looking for does not exist.

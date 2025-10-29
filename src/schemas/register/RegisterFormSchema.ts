@@ -4,10 +4,10 @@ const MAX_FILE_SIZE_MB = 2;
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024; // 2MB em bytes
 
 const ACCEPTED_IMAGE_TYPES = [
-  "image/jpeg",
-  "image/jpg",
-  "image/png",
-  "image/webp",
+	"image/jpeg",
+	"image/jpg",
+	"image/png",
+	"image/webp",
 ];
 
 export const RegisterFormSchema = z.object({
@@ -29,19 +29,15 @@ export const RegisterFormSchema = z.object({
 	image: z
 		.instanceof(FileList)
 		.refine((files) => {
-			if (files.length === 0) return true; 
-			
-	        return files[0]?.size <= MAX_FILE_SIZE_BYTES;
-		}, 
-		`The profile pic have a maximum size of ${MAX_FILE_SIZE_MB}MB`
-		)
+			if (files.length === 0) return true;
+
+			return files[0]?.size <= MAX_FILE_SIZE_BYTES;
+		}, `The profile pic have a maximum size of ${MAX_FILE_SIZE_MB}MB`)
 		.refine((files) => {
-			if(files.length === 0) return true;
-			
+			if (files.length === 0) return true;
+
 			return ACCEPTED_IMAGE_TYPES.includes(files[0].type);
-		},
-		"Please insert a valid image format: PNG, JPG ou WEBP"
-	)
+		}, "Please insert a valid image format: PNG, JPG ou WEBP"),
 });
 
 export type RegisterFormSchemaType = z.infer<typeof RegisterFormSchema>;

@@ -1,9 +1,9 @@
-import { phoneService } from "@/services/PhoneService"
-import { useQuery } from "@tanstack/react-query"
+import { phoneService } from "@/services/PhoneService";
+import { useQuery } from "@tanstack/react-query";
 
 export const useLoggedUserPhones = () => {
-    return useQuery({
-        queryKey: ['loggedUserPhones'],
-        queryFn: phoneService.GetLoggedUserPhone
-    });
+	return useQuery({
+		queryKey: ["loggedUserPhones"],
+		queryFn: phoneService.GetLoggedUserPhone,
+	});
 };

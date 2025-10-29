@@ -1,8 +1,8 @@
-import { phoneService } from "@/services/PhoneService"
-import { useMutation } from "@tanstack/react-query"
+import { phoneService } from "@/services/PhoneService";
+import { useMutation } from "@tanstack/react-query";
 
 export const useUpdatePhone = () => {
-    return useMutation({
-        mutationFn: phoneService.UpdateUserPhones
-    })
-}
+	return useMutation({
+		mutationFn: phoneService.UpdateUserPhones,
+	});
+};
