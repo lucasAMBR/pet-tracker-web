@@ -50,7 +50,7 @@ import {
 	UpdateAddressSchemaType,
 } from "@/schemas/addresses/UpdateAddressSchema";
 
-export function SheetDemo() {
+export function EditProfileButton() {
 	const queryClient = useQueryClient();
 
 	const {

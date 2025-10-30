@@ -1,104 +1,53 @@
 "use client";
 
-import { useState } from "react";
-import { Edit, Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { DatepickerInput } from "@/components/ui/date-input";
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
 import { DropdownMenuItem } from "../ui/dropdown-menu";
+import { Edit } from "lucide-react";
 
-export function EditPetButton () {
-  const [date, setDate] = useState<Date | undefined>(undefined);
-
+export function EditPetButton() {
   return (
-    <Dialog>
-      <DialogTrigger asChild>
+    <Sheet>
+      <SheetTrigger asChild>
         <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
           <Edit /> Edit pet
         </DropdownMenuItem>
-      </DialogTrigger>
-
-      <DialogContent className="sm:max-w-[560px]">
-        <DialogHeader>
-          <DialogTitle>Cadastrar Pet</DialogTitle>
-          <DialogDescription>
-            Preencha os campos abaixo para cadastrar um novo pet.
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="flex flex-col gap-5">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex flex-col gap-2 flex-1">
-              <Label htmlFor="name">Name</Label>
-              <Input id="name" placeholder="Ex: Dogan" />
-            </div>
-
-            <div className="flex flex-col gap-2 flex-1">
-              <DatepickerInput value={date} onChange={setDate} />
-            </div>
+      </SheetTrigger>
+      <SheetContent className="p-4 min-w-[550px]">
+        <SheetHeader>
+          <SheetTitle>Edit profile</SheetTitle>
+          <SheetDescription>
+            Make changes to your profile here. Click save when you&apos;re done.
+          </SheetDescription>
+        </SheetHeader>
+        <div className="grid flex-1 auto-rows-min gap-6 px-4">
+          <div className="grid gap-3">
+            <Label htmlFor="sheet-demo-name">Name</Label>
+            <Input id="sheet-demo-name" defaultValue="Pedro Duarte" />
           </div>
-
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex flex-col gap-2 flex-1">
-              <Label htmlFor="specie">Espécie</Label>
-              <Select>
-                <SelectTrigger id="specie">
-                  <SelectValue placeholder="Selecione a espécie" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Cão">Dog</SelectItem>
-                  <SelectItem value="Gato">Cat</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex flex-col gap-2 flex-1">
-              <Label htmlFor="color">Cor</Label>
-              <Input id="color" placeholder="Ex: Branco e preto" />
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="collarId">ID</Label>
-            <Input id="collarId" placeholder="Ex: CL-ABC123" />
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="observation">Observações</Label>
-            <Textarea
-              id="observation"
-              placeholder="Ex: Alergia à ração X, dócil, precisa de coleira reforçada..."
-              className="min-h-[96px]"
-            />
+          <div className="grid gap-3">
+            <Label htmlFor="sheet-demo-username">Username</Label>
+            <Input id="sheet-demo-username" defaultValue="@peduarte" />
           </div>
         </div>
-
-        <DialogFooter className="flex gap-3 mt-4">
-          <DialogClose asChild>
-            <Button variant="outline">Cancelar</Button>
-          </DialogClose>
-          <Button className="flex items-center gap-2">Salvar Pet</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
+        <SheetFooter>
+          <Button type="submit">Save changes</Button>
+          <SheetClose asChild>
+            <Button variant="outline">Close</Button>
+          </SheetClose>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
+  )
 }

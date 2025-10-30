@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { MapPin, Phone, Mail, PawPrint } from "lucide-react";
 import { useAuth } from "@/providers/UserProvider";
-import { SheetDemo } from "../dashboard/editprofile";
+import { EditProfileButton } from "../dashboard/editprofile";
 import { formatPhone } from "@/lib/formatter";
 import { useLoggedUserPhones } from "@/hooks/Phone/useLoggedUserPhone";
 import { useLoggedUserAddress } from "@/hooks/Address/useLoggedUserAddress";
@@ -94,7 +94,7 @@ export default function ProfileSidebar() {
 				</div>
 
 				<div className="mt-2">
-					<SheetDemo />
+					<EditProfileButton />
 				</div>
 			</CardContent>
 		</Card>
