@@ -8,6 +8,10 @@ import { Spinner } from "@/components/ui/spinner";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/providers/UserProvider";
 import { api } from "@/lib/axios";
+import { DialogDemo } from "@/components/dashboard/addpet";
+import { EditPetButton } from "@/components/dashboard/editpet";
+
+
 
 export type PillTone = "blue" | "green" | "pink";
 export type Pet = {
@@ -72,12 +76,16 @@ export default function Page() {
 					<ProfileSidebar />
 				</aside>
 
-				<main className="space-y-6 md:flex-1">
-					<h1 className="text-3xl font-bold tracking-tight">Pets</h1>
-					<PetGrid pets={pets} />
-					<CareTips />
-				</main>
-			</div>
-		</div>
-	);
+   <main className="space-y-6 md:flex-1">
+          <div className="flex items-center justify-between gap-3">
+            <h1 className="text-3xl font-bold tracking-tight">Pets</h1>
+            <DialogDemo />
+          </div>
+
+          <PetGrid pets={pets} />
+          <CareTips />
+        </main>
+      </div>
+    </div>
+  );
 }

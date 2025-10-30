@@ -5,6 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Syringe, BadgeInfo, Footprints } from "lucide-react";
 import Image from "next/image";
 import type { Pet } from "@/app/(private)/dashboard/page";
+import { EditPetButton } from "@/components/dashboard/editpet";
+
 
 // Fubncao para verificar quantas horas falta para uma data
 const daysUntil = (iso: string) => {
@@ -27,38 +29,24 @@ export default function PetCard({ pet }: { pet: Pet }) {
 	const d = pet.nextVaccine ? daysUntil(pet.nextVaccine.dateISO) : undefined;
 	const overdue = typeof d === "number" ? d < 0 : false;
 
-	// progresso se atrasado -> 100% vermelho; se ok -> avança conforme aproxima (0% longe, 100% na data)
-	const windowDays = pet.nextVaccine?.windowDays ?? 60;
-	const progress =
-		typeof d === "number"
-			? overdue
-				? 100
-				: Math.min(
-						100,
-						Math.max(0, Math.round(((windowDays - d) / windowDays) * 100)),
-					)
-			: 0;
-	return (
-		<Card className="rounded-md bg-white shadow-md hover:shadow-lg transition overflow-hidden dark:bg-neutral-800 dark:shadow-black/10">
-			{/* Capa */}
-			<div className="relative w-full h-40">
-				<Image
-					src={pet.headerImage}
-					alt={pet.name}
-					fill
-					className="object-cover h-full"
-					priority
-				/>
-				<Badge
-					className={`absolute top-3 right-3 text-xs text-white ${
-						online
-							? "bg-cyan-600 hover:bg-cyan-700"
-							: "bg-orange-500 hover:bg-orange-600"
-					}`}
-				>
-					{pet.status}
-				</Badge>
-			</div>
+  // progresso se atrasado -> 100% vermelho; se ok -> avança conforme aproxima (0% longe, 100% na data)
+  const windowDays = pet.nextVaccine?.windowDays ?? 60;
+  const progress =
+    typeof d === "number"
+      ? overdue
+        ? 100
+        : Math.min(100, Math.max(0, Math.round(((windowDays - d) / windowDays) * 100)))
+      : 0;
+  return (
+    <Card className="rounded-md bg-white shadow-md hover:shadow-lg transition overflow-hidden dark:bg-neutral-800 dark:shadow-black/10">
+      {/* Capa */}
+      <div className="relative w-full h-40">
+        <Image src={pet.headerImage} alt={pet.name} fill className="object-cover h-full" priority />
+          <div className="absolute top-3 right-3">
+          <EditPetButton />
+            </div>
+
+             </div>
 
 			{/* Conteúdo */}
 			<CardContent className="p-4">
