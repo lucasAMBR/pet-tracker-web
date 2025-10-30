@@ -32,8 +32,8 @@ export function DialogDemo() {
     <Dialog>
       <DialogTrigger asChild>
         <Button
-          variant="outline"
-          className="flex items-center gap-2 border-cyan-600 text-cyan-600 hover:bg-cyan-600 hover:text-white transition-colors">
+          variant="default"
+          className="flex items-center gap-2 cursor-pointer">
           <Plus className="h-4 w-4" />
           Adicionar Pet
         </Button>

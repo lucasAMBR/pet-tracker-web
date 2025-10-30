@@ -2,11 +2,12 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Syringe, BadgeInfo, Footprints } from "lucide-react";
+import { Syringe, BadgeInfo, Footprints, EllipsisVertical, Edit, Trash, Dog } from "lucide-react";
 import Image from "next/image";
 import type { Pet } from "@/app/(private)/dashboard/page";
 import { EditPetButton } from "@/components/dashboard/editpet";
-
+import { DropdownMenu, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuSeparator } from "../ui/dropdown-menu";
+import { Button } from "../ui/button";
 
 // Fubncao para verificar quantas horas falta para uma data
 const daysUntil = (iso: string) => {
@@ -41,9 +42,30 @@ export default function PetCard({ pet }: { pet: Pet }) {
     <Card className="rounded-md bg-white shadow-md hover:shadow-lg transition overflow-hidden dark:bg-neutral-800 dark:shadow-black/10">
       {/* Capa */}
       <div className="relative w-full h-40">
-        <Image src={pet.headerImage} alt={pet.name} fill className="object-cover h-full" priority />
+        <Image src={pet.headerImage} alt={pet.name} fill className="object-cover h-full w-full" priority />
           <div className="absolute top-3 right-3">
-          <EditPetButton />
+          	<DropdownMenu>
+				<DropdownMenuTrigger>
+					<Button variant={'secondary'} size={'sm'} className="cursor-pointer">
+						<EllipsisVertical />
+					</Button>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent align="end">
+					<DropdownMenuLabel>Pet Option</DropdownMenuLabel>
+					<DropdownMenuGroup>
+						<EditPetButton />
+						<DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+							<Dog /> Edit pet status
+						</DropdownMenuItem>
+					</DropdownMenuGroup>
+					<DropdownMenuSeparator />
+					<DropdownMenuGroup>
+						<DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-red-700 hover:text-red-700 cursor-pointer"> 
+							<Trash className="text-red-700"/> Remove pet
+						</DropdownMenuItem>
+					</DropdownMenuGroup>
+				</DropdownMenuContent>
+			</DropdownMenu>
             </div>
 
              </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus } from "lucide-react";
+import { Edit, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { DatepickerInput } from "@/components/ui/date-input";
+import { DropdownMenuItem } from "../ui/dropdown-menu";
 
 export function EditPetButton () {
   const [date, setDate] = useState<Date | undefined>(undefined);
@@ -31,12 +32,9 @@ export function EditPetButton () {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button
-        variant="ghost"
-       className="flex items-center gap-1 text-[11px] font-medium bg-cyan-600/90 hover:bg-cyan-700 text-white px-2.5 py-1 rounded-full shadow-sm transition-all">
-            <Plus className="h-3 w-3" />
-        Editar Pet
-      </Button>
+        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+          <Edit /> Edit pet
+        </DropdownMenuItem>
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-[560px]">
