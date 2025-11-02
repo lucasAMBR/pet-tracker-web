@@ -2,7 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Syringe, BadgeInfo, Footprints, EllipsisVertical, Edit, Trash, Dog, Palette, Weight, WeightIcon, RulerDimensionLine, MapPinned } from "lucide-react";
+import { Syringe, BadgeInfo, Footprints, EllipsisVertical, Edit, Trash, Dog, Palette, Weight, WeightIcon, RulerDimensionLine, MapPinned, Calendar } from "lucide-react";
 import Image from "next/image";
 import { EditPetButton } from "@/components/dashboard/editpet";
 import { DropdownMenu, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuSeparator } from "../ui/dropdown-menu";
@@ -118,7 +118,7 @@ export default function PetCard({ pet }: PetCardProps) {
 						</div>
 						<div className="flex justify-between">
 							<div className="flex gap-2 items-center">
-								<MapPinned className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
+								<Calendar className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
 								<span>Registered at</span>
 							</div>
 							<span className="text-slate-500 dark:text-slate-400">

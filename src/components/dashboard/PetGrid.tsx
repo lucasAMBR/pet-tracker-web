@@ -29,7 +29,7 @@ export default function PetGrid() {
 
 	if(petList?.length === 0){
 		return(
-			<Card className="shadow-md">
+			<Card className="shadow-md bg-white dark:bg-neutral-800">
 			<Empty className="bg-white dark:bg-neutral-800">
 				<EmptyHeader>
 					<EmptyMedia variant="icon" className="bg-cyan-800 text-white">
@@ -54,7 +54,7 @@ export default function PetGrid() {
 	return (
 		<div className="flex flex-wrap -m-3 mb-4 p-3">
 			{data?.data.map((pet)=>(
-				<PetCard pet={pet} />
+				<PetCard key={pet.id} pet={pet} />
 			))}
 		</div>
 	);
