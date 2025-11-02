@@ -2,167 +2,133 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Syringe, BadgeInfo, Footprints } from "lucide-react";
+import { Syringe, BadgeInfo, Footprints, EllipsisVertical, Edit, Trash, Dog, Palette, Weight, WeightIcon, RulerDimensionLine, MapPinned, Calendar } from "lucide-react";
 import Image from "next/image";
-import type { Pet } from "@/app/(private)/dashboard/page";
+import { EditPetButton } from "@/components/dashboard/editpet";
+import { DropdownMenu, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuSeparator } from "../ui/dropdown-menu";
+import { Button } from "../ui/button";
+import { Pet } from "@/types/Pets/Pet";
+import { calculateAge } from "@/lib/Calculator";
+import { capitalizeFirstLetter, formatReadableDate } from "@/lib/formatter";
 
-// Fubncao para verificar quantas horas falta para uma data
-const daysUntil = (iso: string) => {
-	const target = new Date(iso);
-	const today = new Date();
-	// zera tudo
-	target.setHours(0, 0, 0, 0);
-	today.setHours(0, 0, 0, 0);
-	const ms = target.getTime() - today.getTime();
-	return Math.round(ms / (1000 * 60 * 60 * 24));
-};
+type PetCardProps = {
+	pet: Pet
+}
 
-const formatPtBR = (iso: string) =>
-	new Date(iso).toLocaleDateString("pt-BR", { timeZone: "UTC" });
+export default function PetCard({ pet }: PetCardProps) {
 
-export default function PetCard({ pet }: { pet: Pet }) {
-	const online = pet.status === "Localizado";
+	const age = calculateAge(pet.birthday.toString());
 
-	// vacina (opcional)
-	const d = pet.nextVaccine ? daysUntil(pet.nextVaccine.dateISO) : undefined;
-	const overdue = typeof d === "number" ? d < 0 : false;
-
-	// progresso se atrasado -> 100% vermelho; se ok -> avança conforme aproxima (0% longe, 100% na data)
-	const windowDays = pet.nextVaccine?.windowDays ?? 60;
-	const progress =
-		typeof d === "number"
-			? overdue
-				? 100
-				: Math.min(
-						100,
-						Math.max(0, Math.round(((windowDays - d) / windowDays) * 100)),
-					)
-			: 0;
 	return (
-		<Card className="rounded-md bg-white shadow-md hover:shadow-lg transition overflow-hidden dark:bg-neutral-800 dark:shadow-black/10">
-			{/* Capa */}
-			<div className="relative w-full h-40">
-				<Image
-					src={pet.headerImage}
-					alt={pet.name}
-					fill
-					className="object-cover h-full"
-					priority
-				/>
-				<Badge
-					className={`absolute top-3 right-3 text-xs text-white ${
-						online
-							? "bg-cyan-600 hover:bg-cyan-700"
-							: "bg-orange-500 hover:bg-orange-600"
-					}`}
-				>
-					{pet.status}
-				</Badge>
-			</div>
+		<Card className="rounded-md bg-white shadow-md hover:shadow-lg transition overflow-hidden dark:bg-neutral-800 dark:shadow-black/10 py-0 w-[300px]">
+		{/* Capa */}
+		<div className="relative w-full h-52">
+			<Image src={`${process.env.NEXT_PUBLIC_BACKEND_URL}storage/${pet.image}`} alt={pet.name} fill className="object-cover h-full w-full" priority />
+			<div className="absolute top-3 right-3">
+				<DropdownMenu>
+					<DropdownMenuTrigger>
+						<Button variant={'secondary'} size={'sm'} className="cursor-pointer">
+							<EllipsisVertical />
+						</Button>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent align="end">
+						<DropdownMenuLabel>Pet Option</DropdownMenuLabel>
+						<DropdownMenuGroup>
+							<EditPetButton />
+							<DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+								<Dog /> Edit pet status
+							</DropdownMenuItem>
+						</DropdownMenuGroup>
+						<DropdownMenuSeparator />
+						<DropdownMenuGroup>
+							<DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-red-700 hover:text-red-700 cursor-pointer"> 
+								<Trash className="text-red-700"/> Remove pet
+							</DropdownMenuItem>
+						</DropdownMenuGroup>
+					</DropdownMenuContent>
+				</DropdownMenu>
+				</div>
 
-			{/* Conteúdo */}
-			<CardContent className="p-4">
-				{/* header */}
-				<div className="flex items-center justify-between">
-					<div className="w-full">
-						<div className="flex justify-between items-center">
-							<h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-								{pet.name}
-							</h3>
-							<div className="flex gap-1">
-								{pet.pills.map((p) => (
-									<span
-										key={`${pet.id}-${p.label}`}
-										className={`text-xs px-2 py-1 rounded-full flex items-center truncate ${
-											p.tone === "blue"
-												? "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-200"
-												: p.tone === "green"
-													? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-200"
-													: "bg-pink-100 text-pink-700 dark:bg-pink-900/40 dark:text-pink-200"
-										}`}
-									>
-										{p.label}
-									</span>
-								))}
+				</div>
+
+				{/* Conteúdo */}
+				<CardContent className="px-4 pb-4">
+					{/* header */}
+					<div className="flex items-center justify-between">
+						<div className="w-full">
+							<div className="flex justify-between items-center">
+								<h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+									{pet.name}
+								</h3>
+								<div className="flex gap-1">
+									<Badge>{pet.is_neutred ? "Neutred" : "Not neutred"}</Badge>
+									<Badge variant={'destructive'}>{age.years} Year{age.years > 1 ? "s" : ""} old</Badge>
+								</div>
 							</div>
+							<p className="text-sm text-slate-600 dark:text-slate-300">
+								{capitalizeFirstLetter(pet.sex)}{" "}
+								{capitalizeFirstLetter(pet.specie)}
+								{" - "}
+								{capitalizeFirstLetter(pet.breed)}
+							</p>
 						</div>
-						<p className="text-sm text-slate-600 dark:text-slate-300">
-							{pet.breed}
-						</p>
-					</div>
-				</div>
-
-				{/* infos */}
-				<div className="mt-3 flex flex-col gap-2 text-sm text-slate-700 dark:text-slate-200">
-					<div className="flex justify-between">
-						<div className="flex gap-2 items-center">
-							<Syringe className="h-4 w-4 text-green-600 dark:text-green-400" />
-							<span>{pet.vaccineStatus}</span>
-						</div>
-						<span className="text-slate-500 dark:text-slate-400">
-							Última: {pet.vaccineLast}
-						</span>
 					</div>
 
-					<div className="flex justify-between">
-						<div className="flex gap-2 items-center">
-							<BadgeInfo className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
-							<span>Microchip</span>
-						</div>
-						<span className="text-slate-500 dark:text-slate-400">
-							{pet.microchip}
-						</span>
-					</div>
+					{/* infos */}
+					<div className="mt-3 flex flex-col gap-3 text-sm text-slate-700 dark:text-slate-200">
 
-					<div className="flex justify-between">
-						<div className="flex gap-2 items-center">
-							<Footprints className="h-4 w-4 text-orange-500 dark:text-orange-400" />
-							<span>Último passeio</span>
-						</div>
-						<span className="text-slate-500 dark:text-slate-400">
-							{pet.lastWalk}
-						</span>
-					</div>
-				</div>
-
-				{/* Próxima vacina */}
-				{pet.nextVaccine && (
-					<div className="mt-4 border-t pt-3 border-slate-200 dark:border-neutral-700">
-						<p className="text-sm font-medium text-slate-800 dark:text-slate-100">
-							Próxima vacina{overdue ? ":" : " em:"}
-						</p>
-
-						<div className="mt-2 h-2 rounded-full bg-slate-200 dark:bg-neutral-700">
-							<div
-								className={`h-2 rounded-full ${
-									overdue ? "bg-red-500" : "bg-emerald-500"
-								}`}
-								style={{ width: `${progress}%` }}
-							/>
+						<div className="flex justify-between">
+							<div className="flex gap-2 items-center">
+								<Palette className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
+								<span>Color</span>
+							</div>
+							<span className="text-slate-500 dark:text-slate-400">
+								{capitalizeFirstLetter(pet.color)}
+							</span>
 						</div>
 
-						<p
-							className={`mt-1 text-xs ${overdue ? "text-red-600" : "text-slate-600 dark:text-slate-300"}`}
-						>
-							{typeof d === "number" &&
-								(overdue
-									? `Atrasada há ${Math.abs(d)} dia${Math.abs(d) === 1 ? "" : "s"}`
-									: `${formatPtBR(pet.nextVaccine.dateISO)} (${d} dia${d === 1 ? "" : "s"})`)}
-						</p>
+						<div className="flex justify-between">
+							<div className="flex gap-2 items-center">
+								<Weight className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
+								<span>Weight</span>
+							</div>
+							<span className="text-slate-500 dark:text-slate-400">
+								{pet.weight}{" Kg"}
+							</span>
+						</div>
 
-						<button
-							type="button"
-							className={`mt-3 w-full rounded-full px-4 py-2 text-sm font-medium shadow-sm ${
-								overdue
-									? "bg-red-50 text-red-700 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/40"
-									: "bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-200 dark:hover:bg-blue-900/40"
-							}`}
-						>
-							{overdue ? "Agendamento urgente" : "Ver detalhes completos"}
-						</button>
+						<div className="flex justify-between">
+							<div className="flex gap-2 items-center">
+								<RulerDimensionLine className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
+								<span>Size</span>
+							</div>
+							<span className="text-slate-500 dark:text-slate-400">
+								{capitalizeFirstLetter(pet.size)}
+							</span>
+						</div>
+
+						<div className="flex justify-between">
+							<div className="flex gap-2 items-center">
+								<MapPinned className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
+								<span>Tracker Collar</span>
+							</div>
+							<span className="text-slate-500 dark:text-slate-400">
+								Not have
+							</span>
+						</div>
+						<div className="flex justify-between">
+							<div className="flex gap-2 items-center">
+								<Calendar className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
+								<span>Registered at</span>
+							</div>
+							<span className="text-slate-500 dark:text-slate-400">
+								{formatReadableDate(pet.created_at.toString())}
+							</span>
+						</div>
+
+						<Button>More details</Button>
 					</div>
-				)}
-			</CardContent>
-		</Card>
-	);
+				</CardContent>
+			</Card>
+		);
 }

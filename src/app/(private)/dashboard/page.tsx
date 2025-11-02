@@ -8,6 +8,10 @@ import { Spinner } from "@/components/ui/spinner";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/providers/UserProvider";
 import { api } from "@/lib/axios";
+import { AddPetModal } from "@/components/dashboard/addpet";
+import { EditPetButton } from "@/components/dashboard/editpet";
+
+
 
 export type PillTone = "blue" | "green" | "pink";
 export type Pet = {
@@ -30,38 +34,6 @@ export type Pet = {
 };
 
 export default function Page() {
-	const petBase: Pet = {
-		id: "1",
-		name: "Dogan",
-		breed: "Bulldog Frances",
-		gender: "Macho",
-		age: "3 anos",
-		status: "Alerta",
-		vaccineStatus: "Localizado",
-		vaccineLast: "02/03/2023",
-		microchip: "#12345678",
-		lastWalk: "Hoje, 14:30",
-		headerImage: "/images/Dogan.png",
-		pills: [
-			{ label: "Macho", tone: "blue" },
-			{ label: "3 anos", tone: "green" },
-		],
-		nextVaccine: {
-			dateISO: "2025-10-15",
-			windowDays: 10,
-		},
-	};
-
-	const pets: Pet[] = [];
-
-	for (let i = 0; i < 6; i++) {
-		const newPet = {
-			...petBase,
-			id: String(i + 1),
-		};
-
-		pets.push(newPet);
-	}
 
 	return (
 		<div className="min-h-screen ...">
@@ -72,12 +44,16 @@ export default function Page() {
 					<ProfileSidebar />
 				</aside>
 
-				<main className="space-y-6 md:flex-1">
-					<h1 className="text-3xl font-bold tracking-tight">Pets</h1>
-					<PetGrid pets={pets} />
-					<CareTips />
-				</main>
-			</div>
-		</div>
-	);
+   <main className="space-y-6 md:flex-1">
+          <div className="flex items-center justify-between gap-3">
+            <h1 className="text-3xl font-bold tracking-tight">Pets</h1>
+            <AddPetModal />
+          </div>
+
+          <PetGrid />
+          <CareTips />
+        </main>
+      </div>
+    </div>
+  );
 }
