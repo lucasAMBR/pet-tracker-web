@@ -47,9 +47,6 @@ export default function ProfileSidebar() {
 				<CardTitle className="mt-3 text-xl text-slate-900 dark:text-slate-100">
 					<p>{loggedUserProfile?.data.name}</p>
 				</CardTitle>
-				<p className="mt-1 text-center text-sm text-slate-600 dark:text-slate-300 max-w-[240px]">
-					Bio qualquer
-				</p>
 			</CardHeader>
 
 			<CardContent className="space-y-4">

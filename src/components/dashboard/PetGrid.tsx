@@ -52,7 +52,7 @@ export default function PetGrid() {
 	}
 
 	return (
-		<div className="flex flex-wrap -m-3 mb-4 p-3">
+		<div className="flex flex-wrap -m-3 mb-4 p-3 gap-3">
 			{data?.data.map((pet)=>(
 				<PetCard key={pet.id} pet={pet} />
 			))}
