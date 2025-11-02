@@ -148,7 +148,7 @@ const RegisterPage = () => {
 					<div className="">
 						<Label className="mb-2">Profile picture</Label>
 						<Input
-							{...register('image')}
+							{...register("image")}
 							type="file"
 							id="profile picture"
 							placeholder="Password"
