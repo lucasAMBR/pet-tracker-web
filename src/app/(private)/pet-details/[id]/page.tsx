@@ -1,8 +1,8 @@
 "use client";
 
-import TopSearch from "../../../components/dashboard/topsearch";
-import ProfileSidebar from "../../../components/dashboard/ProfileSidebar";
 import PetDetails from "@/components/dashboard/PetDetails"; 
+import ProfileSidebar from "@/components/dashboard/ProfileSidebar";
+import TopSearch from "@/components/dashboard/topsearch";
 
 export default function Page() {
   return (

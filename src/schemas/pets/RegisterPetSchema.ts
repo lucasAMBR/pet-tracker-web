@@ -18,8 +18,8 @@ export const RegisterPetSchema = z.object({
     name: z.string("Name must be a string")
         .min(2, "The name must have at least two characters")
         .max(100, "The name have a maximum limit of 100 characters"),
-    specie: z
-        .enum(SpeciesEnum, "The specie value must be one of these values: Cat, Dog or Other"),
+    specie_id: z
+        .number(),
     sex: z.enum(SexEnum, "The sex must be male or female"),
     breed: z.string("Breed must be a string")
         .min(3, "The pet breed must have at least 3 characters")

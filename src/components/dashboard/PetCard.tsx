@@ -2,7 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Syringe, BadgeInfo, Footprints, EllipsisVertical, Edit, Trash, Dog, Palette, Weight, WeightIcon, RulerDimensionLine, MapPinned, Calendar } from "lucide-react";
+import { Syringe, BadgeInfo, Footprints, EllipsisVertical, Edit, Trash, Dog, Palette, Weight, WeightIcon, RulerDimensionLine, MapPinned, Calendar, Cat } from "lucide-react";
 import Image from "next/image";
 import { EditPetButton } from "@/components/dashboard/editpet";
 import { DropdownMenu, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuSeparator } from "../ui/dropdown-menu";
@@ -10,6 +10,7 @@ import { Button } from "../ui/button";
 import { Pet } from "@/types/Pets/Pet";
 import { calculateAge } from "@/lib/Calculator";
 import { capitalizeFirstLetter, formatReadableDate } from "@/lib/formatter";
+import { useRouter } from "next/navigation";
 
 type PetCardProps = {
 	pet: Pet
@@ -17,13 +18,19 @@ type PetCardProps = {
 
 export default function PetCard({ pet }: PetCardProps) {
 
+	const router = useRouter();
+
 	const age = calculateAge(pet.birthday.toString());
 
 	return (
 		<Card className="rounded-md bg-white shadow-md hover:shadow-lg transition overflow-hidden dark:bg-neutral-800 dark:shadow-black/10 py-0 w-[300px]">
 		{/* Capa */}
 		<div className="relative w-full h-52">
-			<Image src={`${process.env.NEXT_PUBLIC_BACKEND_URL}storage/${pet.image}`} alt={pet.name} fill className="object-cover h-full w-full" priority />
+			{pet.image == null ? (
+				<div className="object-cover h-full w-full bg-neutral-600 flex items-center justify-center text-neutral-500">{pet.specie.name == "dog" ? <Dog className="w-32 h-32"/> : <Cat className="w-32 h-32"/>}</div>
+			) : (
+				<Image src={`${process.env.NEXT_PUBLIC_BACKEND_URL}storage/${pet.image}`} alt={pet.name} fill className="object-cover h-full w-full" priority />
+			)}
 			<div className="absolute top-3 right-3">
 				<DropdownMenu>
 					<DropdownMenuTrigger>
@@ -67,7 +74,7 @@ export default function PetCard({ pet }: PetCardProps) {
 							</div>
 							<p className="text-sm text-slate-600 dark:text-slate-300">
 								{capitalizeFirstLetter(pet.sex)}{" "}
-								{capitalizeFirstLetter(pet.specie)}
+								{capitalizeFirstLetter(pet.specie.name)}
 								{" - "}
 								{capitalizeFirstLetter(pet.breed)}
 							</p>
@@ -126,7 +133,7 @@ export default function PetCard({ pet }: PetCardProps) {
 							</span>
 						</div>
 
-						<Button>More details</Button>
+						<Button className="cursor-pointer" onClick={() => router.push(`/pet-details/${pet.id}`)}>More details</Button>
 					</div>
 				</CardContent>
 			</Card>

@@ -16,7 +16,7 @@ const registerNewPet = async(
         const formData = new FormData();
 
         formData.append("name", petData.name);
-        formData.append("specie", petData.specie);
+        formData.append("specie_id", petData.specie_id.toString());
         formData.append("sex", petData.sex);
         formData.append("breed", petData.breed);
         formData.append("size", petData.size);

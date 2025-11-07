@@ -25,6 +25,8 @@ export default function PetGrid() {
 		return <Spinner />
 	}
 
+	console.log(data);
+
 	const petList = data?.data;
 
 	if(petList?.length === 0){

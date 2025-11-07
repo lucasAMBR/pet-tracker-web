@@ -61,7 +61,8 @@ export function AddPetModal() {
   } = useForm<RegisterPetSchemaType>({
       resolver: zodResolver(RegisterPetSchema),
       defaultValues: {
-        is_neutred: false
+        is_neutred: false,
+        specie_id: 1
       }
     })
 
@@ -71,7 +72,8 @@ export function AddPetModal() {
     setIsOpen(open);
     if (open) {
       reset({
-        is_neutred: false
+        is_neutred: false,
+        specie_id: 1
       });
     }
   };
@@ -140,24 +142,28 @@ export function AddPetModal() {
                 />
               </div>
               <div className="flex flex-col gap-3 flex-1">
-                <Label htmlFor="specie">Specie</Label>
-                <Controller control={control} name="specie" render={({field}) => (
+              <Label htmlFor="specie">Specie</Label>
+              <Controller 
+                control={control} 
+                name="specie_id" 
+                render={({ field }) => (
                   <Select 
-                    onValueChange={field.onChange}
-                    value={field.value}
-                    defaultValue={field.value}
+                    onValueChange={(value) => {
+                      field.onChange(Number(value));
+                    }}
+                    value={String(field.value)}
                   >
                     <SelectTrigger id="specie" className="w-full">
                       <SelectValue placeholder="Select the pet specie" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="dog"><Dog /> Dog</SelectItem>
-                      <SelectItem value="cat"><Cat /> Cat</SelectItem>
-                      <SelectItem value="other"><CircleQuestionMark /> Other</SelectItem>
+                      <SelectItem value="1"><Dog /> Dog</SelectItem>
+                      <SelectItem value="2"><Cat /> Cat</SelectItem>
+                      <SelectItem value="3"><CircleQuestionMark /> Other</SelectItem>
                     </SelectContent>
                   </Select>
-                )}/>
-              </div>
+              )}/>
+            </div>
             </div>
 
             <div className="flex flex-col md:flex-row gap-4">
