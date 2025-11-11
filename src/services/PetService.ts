@@ -50,7 +50,27 @@ const listAllUserPets = async(): Promise<ApiResponse<Pet[]>> => {
     }
 }
 
+const showPetDetailsByPetId = async(petId: number): Promise<ApiResponse<Pet>> => {
+    try{
+        const response = await api.get(`/pets/${petId}`);
+        return response.data;
+    }catch(error){
+        throw error;
+    }
+}
+
+const showPetDetailsByCollarId = async(collarId: string): Promise<ApiResponse<Pet>> => {
+    try{
+        const response = await api.get(`/collars/${collarId}`);
+        return response.data;
+    }catch(error){
+        throw error;
+    }
+}
+
 export const PetService = {
     registerNewPet,
-    listAllUserPets
+    listAllUserPets,
+    showPetDetailsByCollarId,
+    showPetDetailsByPetId
 }

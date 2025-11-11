@@ -22,6 +22,8 @@ export default function PetCard({ pet }: PetCardProps) {
 
 	const age = calculateAge(pet.birthday.toString());
 
+	console.log(pet);
+
 	return (
 		<Card className="rounded-md bg-white shadow-md hover:shadow-lg transition overflow-hidden dark:bg-neutral-800 dark:shadow-black/10 py-0 w-[300px]">
 		{/* Capa */}
@@ -115,12 +117,12 @@ export default function PetCard({ pet }: PetCardProps) {
 						</div>
 
 						<div className="flex justify-between">
-							<div className="flex gap-2 items-center">
+							<div className="flex gap-2 items-center min-w-fit">
 								<MapPinned className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
-								<span>Tracker Collar</span>
+								<span>Have tracker collar</span>
 							</div>
-							<span className="text-slate-500 dark:text-slate-400">
-								Not have
+							<span className="text-slate-500 dark:text-slate-400 truncate">
+								{pet.collar ? "Yes" : "Dont'have"}
 							</span>
 						</div>
 						<div className="flex justify-between">
@@ -133,7 +135,7 @@ export default function PetCard({ pet }: PetCardProps) {
 							</span>
 						</div>
 
-						<Button className="cursor-pointer" onClick={() => router.push(`/pet-details/${pet.id}`)}>More details</Button>
+						<Button className="cursor-pointer" onClick={() => router.push(`/pet-details?pet_id=${pet.id}`)}>More details</Button>
 					</div>
 				</CardContent>
 			</Card>

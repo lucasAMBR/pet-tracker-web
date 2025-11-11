@@ -250,6 +250,7 @@ export function AddPetModal() {
               />
               <div className="flex flex-col gap-3 flex-1">
                 <DatepickerInput
+                  label="Birthdate"
 						      value={date}
 						      onChange={(date) => {setValue('birthday', date as Date)}}
 					      />

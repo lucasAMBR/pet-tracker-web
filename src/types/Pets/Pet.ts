@@ -11,6 +11,7 @@ export type Pet = {
     weight: number,
     is_neutred: boolean,
     image: string | null,
+    collar: Collar | null,
     created_at: Date,
     updated_at: Date 
 }
@@ -18,4 +19,11 @@ export type Pet = {
 type PetSpecie = {
     id: number,
     name: string
+}
+
+type Collar = {
+    id: string,
+    pet_id: number,
+    created_at: Date,
+    update_at: Date
 }

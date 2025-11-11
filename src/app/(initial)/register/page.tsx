@@ -142,6 +142,7 @@ const RegisterPage = () => {
 					</div>
 					<input type="hidden" {...register("birthday")} />
 					<DatepickerInput
+						label="Birthdate"
 						value={date}
 						onChange={(date) => setValue("birthday", date as Date)}
 					/>

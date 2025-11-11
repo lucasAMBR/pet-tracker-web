@@ -38,9 +38,11 @@ function isValidDate(date: Date | undefined) {
 export function DatepickerInput({
 	value,
 	onChange,
+	label
 }: {
 	value: Date | undefined;
 	onChange: (date: Date | undefined) => void;
+	label: string
 }) {
 	const [open, setOpen] = React.useState(false);
 	const [month, setMonth] = React.useState<Date | undefined>(value);
@@ -53,7 +55,7 @@ export function DatepickerInput({
 	return (
 		<div className="flex flex-col gap-3">
 			<Label htmlFor="date" className="px-1">
-				Birthdate
+				{label}
 			</Label>
 			<div className="relative flex gap-2">
 				<Input

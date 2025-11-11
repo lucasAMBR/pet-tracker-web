@@ -2,17 +2,107 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Syringe, BadgeInfo, MapPin, Phone, Mail } from "lucide-react";
+import { Syringe, BadgeInfo, MapPin, Phone, Mail, Dog, Cat, EllipsisVertical, Plus, ScanHeart, ArrowUpRightIcon } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
   ToggleGroup,
   ToggleGroupItem,
 } from "@/components/ui/toggle-group";
 import { useState } from "react";
+import { usefindPetDetails } from "@/hooks/Pets/useFindPetDetails";
+import { calculateAge } from "@/lib/Calculator";
+import { Badge } from "../ui/badge";
+import { usePetChronicDiseases } from "@/hooks/PetDisease/UsePetChronicDiseases";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { Button } from "../ui/button";
+import { Dialog, DialogContent } from "../ui/dialog";
+import UpdateDiseaseModal from "../PetDetails/UpdateDiseaseModal";
+import DeleteDiseaseModal from "../PetDetails/DeleteDiseaseModal";
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "../ui/empty";
+import { usePetNormalDisease } from "@/hooks/PetDisease/usePetNormalDiseases";
+import { Spinner } from "../ui/spinner";
+import { CreateDiseaseModal } from "../PetDetails/CreateDiseasesModal";
+import { Pet } from "@/types/Pets/Pet";
+
 
 export default function PetDetails() {
-  const [secaoDoencas, setSecaoDoencas] = useState<'cronicas' | 'enfermidades'>('cronicas');
+  const [diseaseSection, setDiseaseSection] = useState<'chronic' | 'normal'>('chronic');
 
+  const [selectedDisease, setSelectedDisease] = useState<PetDisease | undefined>(undefined);
+
+  const [ createDiseaseModalIsOpen, setCreateDiseaseModalIsOpen ] = useState<boolean>(false);
+
+  const handleOpenCreateDisease = () => {
+    setCreateDiseaseModalIsOpen(true);
+  }
+
+  const handleCreateDisaeseOpenChange = (open: boolean) => {
+    setCreateDiseaseModalIsOpen(open);
+  }
+
+  const [ updateDiseaseIsOpen, setUpdateDiseaseIsOpen ] = useState<boolean>(false);
+
+  const handleOpenUpdateDisease = (disease: PetDisease) => {
+    setSelectedDisease(disease);
+    setUpdateDiseaseIsOpen(true);
+  }
+
+  const handleUpdateDiseaseOpenChange = (open: boolean) => {
+    setUpdateDiseaseIsOpen(open);
+    if(!open){
+      setSelectedDisease(undefined);
+    }
+  }
+
+  const [ deleteDiseaseModalIsOpen, setDeleteDiseaseModalIsOpen ] = useState<boolean>(false);
+
+  const handleOpenDeleteDisease = (disease: PetDisease) => {
+    setSelectedDisease(disease);
+    setDeleteDiseaseModalIsOpen(true);
+  }
+
+  const handleDeleteDiseaseIsOpen = (open: boolean) => {
+    setDeleteDiseaseModalIsOpen(open);
+    if(!open){
+      setSelectedDisease(undefined);
+    }
+  }
+
+  const {
+    data: petData,
+    isLoading: petIsLoading,
+    isError: petIsError,
+    error: petErrors,
+    isSuccess: petIsSuccess
+  } = usefindPetDetails();
+
+  const {
+    data: petChronicDiseases,
+    isLoading: petChronicDiseasesIsLoading,
+    isError: petChronicDiseasesIsError,
+  } = usePetChronicDiseases(petData?.data.id as number);
+
+  const {
+    data: petNormalDiseases,
+    isLoading: petNormalDiseasesIsLoading,
+    isError: petNormalDiseasesIsError
+  } = usePetNormalDisease(petData?.data.id as number);
+
+  const customBadgeColorForDiseaseStatus = (diseaseStatus: string) => {
+    switch (diseaseStatus){
+      case "confirmed":
+        return "bg-red-500"
+      case "suspected":
+        return "bg-indigo-500"
+      case "resolved": 
+        return "bg-green-500"
+      case "monitoring":
+        return "bg-gray-400"
+    }
+  }
+
+  const age = calculateAge(petData?.data.birthday.toString() as string);
+  console.log(age);
   return (
     <div>
       <h1 className="text-3xl font-bold tracking-tight mb-6">Pet Details</h1>
@@ -22,13 +112,29 @@ export default function PetDetails() {
           <div className="flex items-center justify-between gap-4 p-4">
             <div className="flex items-center gap-4">
               <Avatar className="h-[200px] w-[200px] ring-2 ring-gray-500">
-                <AvatarImage src="/images/Dogan.png" alt="Photo Pet" />
-                <AvatarFallback></AvatarFallback>
+                <AvatarImage src={`${process.env.NEXT_PUBLIC_BACKEND_URL}storage/${petData?.data.image}`} alt="Photo Pet" />
+                <AvatarFallback className="bg-neutral-900">{petData?.data.specie.name === "Cão" ? <Dog className="w-32 h-32 text-neutral-600"/> : <Cat className="w-32 h-32 text-neutral-600" />}</AvatarFallback>
               </Avatar>
 
               <div className="flex flex-col gap-1">
-                <h2 className="text-5xl font-semibold leading-none padding">nome pet</h2>
-                <p className="text-sm text-slate-600 dark:text-slate-300">puxar infos pet</p>
+                <h2 className="text-5xl font-semibold leading-none padding">{petData?.data.name}</h2>
+                <div className="flex text-sm text-slate-600 dark:text-slate-300 gap-2">
+                  <Badge>
+                    {petData?.data.specie.name}
+                  </Badge>
+                  <Badge className="">
+                    {age.years == 0 ? "" : age.years}
+                    {" "}
+                    {age.years > 1 ? "years" : ""}
+                    {" "}
+                    {age.months > 0 ? age.months : ""}
+                    {" "}
+                    {age.months > 1 ? "months" : "month"}
+                  </Badge>
+                  <Badge className="bg-blue-400">
+                    {petData?.data.sex}
+                  </Badge>
+                </div>
               </div>
             </div>
           </div>
@@ -77,35 +183,98 @@ export default function PetDetails() {
 
           <div className="flex flex-col gap-8 mb-6">
             <div className="flex flex-col gap-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <ToggleGroup
-                    type="single"
-                    value={secaoDoencas}
-                    onValueChange={(val) => { if (val) setSecaoDoencas(val as 'cronicas' | 'enfermidades'); }}
-                    className="flex"
-                  >
-                    <ToggleGroupItem value="cronicas" className="px-3 py-1 h-[32px]">
-                      Doenças crônicas
-                    </ToggleGroupItem>
-                    <ToggleGroupItem value="enfermidades" className="px-3 py-1 h-[32px]">
-                      Enfermidades atuais
-                    </ToggleGroupItem>
-                  </ToggleGroup>
+              <div className="flex flex-1 items-center mb-2">
+                <div className="flex flex-1">
+                  <div className={`cursor-pointer hover:bg-neutral-600 h-full p-2 ${diseaseSection === 'chronic' ? "border-b-2 border-b-cyan-500 font-bold" : ""}`} onClick={() => setDiseaseSection('chronic')}>
+                    Chronic Diseases
+                  </div>
+                  <div className={`cursor-pointer hover:bg-neutral-600 h-full p-2 ${diseaseSection === 'normal' ? "border-b-2 border-b-cyan-500 font-bold" : ""}`} onClick={() => setDiseaseSection('normal')}>
+                    Normal Diseases
+                  </div>
                 </div>
+                <Button size={"sm"} className="text-xs" onClick={handleOpenCreateDisease}><Plus /> Register new disease</Button>
               </div>
+              {diseaseSection === "chronic" ? (
+                <div className="flex flex-col gap-1">
+                  {petChronicDiseasesIsLoading && <Spinner />}
+                  {petChronicDiseases?.data.length === 0 && (
+                    <Empty className="gap-2">
+                      <EmptyHeader className="gap-0">
+                        <EmptyMedia variant="icon">
+                          <ScanHeart />
+                        </EmptyMedia>
+                        <EmptyTitle className="my-0">No chronic diseases registered</EmptyTitle>
+                      </EmptyHeader>
+                      <EmptyContent>
+                        <div className="flex gap-2">
+                          <Button onClick={handleOpenCreateDisease}>Register</Button>
+                        </div>
+                      </EmptyContent>
+                    </Empty>
+                  )}
+                  {petChronicDiseases?.data.map((disease, index) => (
+                    <div key={disease.id} className="flex items-center border p-3 rounded-md dark:bg-neutral-900/40 dark:border-neutral-700">
+                      <div className="flex">
+                        <span className="font-semibold">{disease.name}</span>
+                        <Badge className={`mx-2 ${customBadgeColorForDiseaseStatus(disease.diagnosis_status)}`}>{disease.diagnosis_status}</Badge>
+                      </div>
+                      <p className="flex-1 text-center text-sm"><span className="font-semibold">Type:</span> {disease.is_chronic ? "Chronic" : "Normal"}</p>
+                      <p className="flex-1 text-center text-sm"><span className="font-semibold">Diagnosed at:</span> {disease.diagnosis_date.toString()}</p>
+                      <div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger className="bg-neutral-900 p-1 rounded-md cursor-pointer"><EllipsisVertical className="h-4 w-4" /></DropdownMenuTrigger>
+                          <DropdownMenuContent side="bottom">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="cursor-pointer" onSelect={() => handleOpenUpdateDisease(disease)}>Update</DropdownMenuItem>
+                            <DropdownMenuItem className="cursor-pointer" onSelect={() => handleOpenDeleteDisease(disease)}>Delete</DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </div>
+                  ))}
 
-              {secaoDoencas === 'cronicas' ? (
-                <div className="flex flex-col gap-2 text-sm border border-slate-200 dark:border-neutral-700 rounded-md p-3 bg-slate-50 dark:bg-neutral-900/40">
-                  <p className="text-slate-700 dark:text-slate-200">- Exemplo AISDIUASHD </p>
-                  <p className="text-slate-700 dark:text-slate-200">- Exemplo AISDIUASHD</p>
-                  <p className="text-slate-600 dark:text-slate-400">Última atualização 03/08/2025</p>
                 </div>
               ) : (
-                <div className="flex flex-col gap-2 text-sm border border-slate-200 dark:border-neutral-700 rounded-md p-3 bg-slate-50 dark:bg-neutral-900/40">
-                  <p className="text-slate-700 dark:text-slate-200">- Exemplo: AAAAAAAAAAAAAA</p>
-                  <p className="text-slate-700 dark:text-slate-200">- Exemplo: BBBBBBBBBBBBB</p>
-                  <p className="text-slate-600 dark:text-slate-400">Reavaliar em 12/11/2025</p>
+                <div className="flex flex-col gap-1">
+                  {petNormalDiseasesIsLoading && <Spinner />}
+                  {petNormalDiseases?.data.length === 0 && (
+                    <Empty className="gap-2">
+                      <EmptyHeader className="gap-0">
+                        <EmptyMedia variant="icon">
+                          <ScanHeart />
+                        </EmptyMedia>
+                        <EmptyTitle className="my-0">No normal diseases registered</EmptyTitle>
+                      </EmptyHeader>
+                      <EmptyContent>
+                        <div className="flex gap-2">
+                          <Button onClick={handleOpenCreateDisease}>Register</Button>
+                        </div>
+                      </EmptyContent>
+                    </Empty>
+                  )}
+                  {petNormalDiseases?.data.map((disease, index) => (
+                    <div key={disease.id} className="flex items-center border p-3 rounded-md dark:bg-neutral-900/40 dark:border-neutral-700">
+                      <div className="flex">
+                        <span className="font-semibold">{disease.name}</span>
+                        <Badge className={`mx-2 ${customBadgeColorForDiseaseStatus(disease.diagnosis_status)}`}>{disease.diagnosis_status}</Badge>
+                      </div>
+                      <p className="flex-1 text-center text-sm"><span className="font-semibold">Type:</span> {disease.is_chronic ? "Chronic" : "Normal"}</p>
+                      <p className="flex-1 text-center text-sm"><span className="font-semibold">Diagnosed at:</span> {disease.diagnosis_date.toString()}</p>
+                      <div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger className="bg-neutral-900 p-1 rounded-md cursor-pointer"><EllipsisVertical className="h-4 w-4" /></DropdownMenuTrigger>
+                          <DropdownMenuContent side="bottom">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="cursor-pointer" onSelect={() => handleOpenUpdateDisease(disease)}>Update</DropdownMenuItem>
+                            <DropdownMenuItem className="cursor-pointer" onSelect={() => handleOpenDeleteDisease(disease)}>Delete</DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </div>
+                  ))}
+
                 </div>
               )}
             </div>
@@ -185,9 +354,23 @@ export default function PetDetails() {
               <span className="text-slate-600 dark:text-slate-300">powers@gmail.com</span>
             </div>
           </div>
-
         </CardContent>
       </Card>
+      <Dialog open={updateDiseaseIsOpen} onOpenChange={handleUpdateDiseaseOpenChange}>
+        <DialogContent>
+          {selectedDisease && <UpdateDiseaseModal petDisease={selectedDisease} handleOpen={handleUpdateDiseaseOpenChange}/>}
+        </DialogContent>
+      </Dialog>
+      <Dialog open={deleteDiseaseModalIsOpen} onOpenChange={handleDeleteDiseaseIsOpen}>
+        <DialogContent>
+          {selectedDisease && <DeleteDiseaseModal handleOpen={handleDeleteDiseaseIsOpen} selectedDisease={selectedDisease}/>}
+        </DialogContent>
+      </Dialog>
+      <Dialog open={createDiseaseModalIsOpen} onOpenChange={handleCreateDisaeseOpenChange}>
+        <DialogContent>
+          <CreateDiseaseModal handleOpen={handleCreateDisaeseOpenChange} pet={petData?.data as Pet}/>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
