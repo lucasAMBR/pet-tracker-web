@@ -44,6 +44,7 @@ const updatePetDiseasesById = async({disease_id, new_disease_data}: diseaseUpdat
     const apiPayload = {
         ...new_disease_data,
         diagnosis_date: format(new_disease_data.diagnosis_date as Date, 'yyyy-MM-dd'),
+        resolved_date: new_disease_data.resolved_date === undefined ? undefined : format(new_disease_data.resolved_date as Date, 'yyyy-MM-dd')
     };
     try{
         const response = await api.patch(`/pet-diseases/${disease_id}`, apiPayload);

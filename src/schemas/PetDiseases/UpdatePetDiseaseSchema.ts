@@ -8,6 +8,7 @@ export const UpdatePetDiseaseSchema = z.object({
         (diagnosis_date) => diagnosis_date < new Date()
     ).optional(),
     resolved_date: z.date().optional(),
+    clinical_notes: z.string().optional()
 })
 
 export type UpdatePetDiseaseSchemaType = z.infer<typeof UpdatePetDiseaseSchema>;

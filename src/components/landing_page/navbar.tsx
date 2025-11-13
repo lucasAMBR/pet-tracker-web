@@ -24,14 +24,6 @@ const Navbar = () => {
 					<Button
 						variant="secondary"
 						className="cursor-pointer hover:bg-white text-black bg-neutral-300"
-						onClick={() => router.push("/dashboard")}
-					>
-						Profile
-					</Button>
-
-					<Button
-						variant="secondary"
-						className="cursor-pointer hover:bg-white text-black bg-neutral-300"
 						onClick={() => router.push("/login")}
 					>
 						Login
