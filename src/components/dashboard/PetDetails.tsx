@@ -2,7 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Syringe, BadgeInfo, MapPin, Phone, Mail, Dog, Cat, EllipsisVertical, Plus, ScanHeart, ArrowUpRightIcon } from "lucide-react";
+import { Syringe, BadgeInfo, MapPin, Phone, Mail, Dog, Cat, EllipsisVertical, Plus, ScanHeart, ArrowUpRightIcon, Ellipsis, Search, Minus } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
   ToggleGroup,
@@ -23,14 +23,27 @@ import { usePetNormalDisease } from "@/hooks/PetDisease/usePetNormalDiseases";
 import { Spinner } from "../ui/spinner";
 import { CreateDiseaseModal } from "../PetDetails/CreateDiseasesModal";
 import { Pet } from "@/types/Pets/Pet";
+import { Textarea } from "../ui/textarea";
+import { useCreatePetObservation } from "@/hooks/PetObservations/useCreatePetObservation";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { CreatePetObservationSchema, CreatePetObservationSchemaType } from "@/schemas/petObservations/CreatePetObservationSchema";
+import { PetObservation } from "@/types/petObservations/PetObservations";
+import { usePetObservations } from "@/hooks/PetObservations/UsePetObservations";
+import ErrorBox from "../global/error-advertise";
+import DeletePetObservationModal from "../PetDetails/DeletePetObservation";
+import UpdatePetObservationModal from "../PetDetails/UpdatePetObservationModal";
 
 
 export default function PetDetails() {
   const [diseaseSection, setDiseaseSection] = useState<'chronic' | 'normal'>('chronic');
 
   const [selectedDisease, setSelectedDisease] = useState<PetDisease | undefined>(undefined);
+  const [selectedObservation, setSelectedObservation] = useState<PetObservation | undefined>(undefined);
 
   const [ createDiseaseModalIsOpen, setCreateDiseaseModalIsOpen ] = useState<boolean>(false);
+
+  const [ newObservationIsOpen, setNewObservationIsOpen ] = useState<boolean>(false);
 
   const handleOpenCreateDisease = () => {
     setCreateDiseaseModalIsOpen(true);
@@ -68,6 +81,34 @@ export default function PetDetails() {
     }
   }
 
+  const [ deleteObservationModalIsOpen, setDeleteObservationModalIsOpen ] = useState<boolean>(false);
+
+  const handleOpenDeleteObservation = (observation: PetObservation) => {
+    setSelectedObservation(observation);
+    setDeleteObservationModalIsOpen(true);
+  }
+
+  const handleDeleteObservationIsOpen = (open: boolean) => {
+    setDeleteObservationModalIsOpen(open);
+    if(!open){
+      setSelectedObservation(undefined);
+    }
+  }
+
+  const [ updatePetObservationModalIsOpen, setUpdatePetObservationModalIsOpen ] = useState<boolean>(false);
+
+    const handleOpenUpdateObservation = (observation: PetObservation) => {
+    setSelectedObservation(observation);
+    setUpdatePetObservationModalIsOpen(true);
+  }
+
+  const handleUpdateObservationIsOpen = (open: boolean) => {
+    setUpdatePetObservationModalIsOpen(open);
+    if(!open){
+      setSelectedObservation(undefined);
+    }
+  }
+
   const {
     data: petData,
     isLoading: petIsLoading,
@@ -87,6 +128,39 @@ export default function PetDetails() {
     isLoading: petNormalDiseasesIsLoading,
     isError: petNormalDiseasesIsError
   } = usePetNormalDisease(petData?.data.id as number);
+
+  const {
+    mutate: createObservation,
+    isPending: observationIsPending,
+    error: observationIsError
+  } = useCreatePetObservation();
+
+  const {
+    register: registerObservation,
+    handleSubmit: observationSubmit,
+    formState: {errors: observationValidationErrors, isSubmitting: observationIsSubmitting},
+    reset: resetObservation
+  } = useForm({
+    resolver: zodResolver(CreatePetObservationSchema),
+    defaultValues: {
+      'description': ''
+    }
+  });
+
+  const sendObeservationToApi: SubmitHandler<CreatePetObservationSchemaType> = (data) => {
+    try{
+      createObservation({pet_id: petData?.data.id as number, observation_data: data});
+      resetObservation();
+    }catch(error){
+      console.log(error);
+    }
+  }
+
+  const {
+    data: petObservations,
+    isFetching: observationsIsFetching,
+    error: observationsError
+  } = usePetObservations(petData?.data.id as number);
 
   const customBadgeColorForDiseaseStatus = (diseaseStatus: string) => {
     switch (diseaseStatus){
@@ -192,7 +266,7 @@ export default function PetDetails() {
                     Normal Diseases
                   </div>
                 </div>
-                <Button size={"sm"} className="text-xs" onClick={handleOpenCreateDisease}><Plus /> Register new disease</Button>
+                <Button size={"sm"} variant={'outline'} className="text-xs" onClick={handleOpenCreateDisease}><Plus /> Register new disease</Button>
               </div>
               {diseaseSection === "chronic" ? (
                 <div className="flex flex-col gap-1">
@@ -222,7 +296,7 @@ export default function PetDetails() {
                       <p className="flex-1 text-center text-sm"><span className="font-semibold">Diagnosed at:</span> {disease.diagnosis_date.toString()}</p>
                       <div>
                         <DropdownMenu>
-                          <DropdownMenuTrigger className="bg-neutral-900 p-1 rounded-md cursor-pointer"><EllipsisVertical className="h-4 w-4" /></DropdownMenuTrigger>
+                          <DropdownMenuTrigger className="dark:bg-neutral-900 bg-gray-300 p-1 rounded-md cursor-pointer"><EllipsisVertical className="h-4 w-4" /></DropdownMenuTrigger>
                           <DropdownMenuContent side="bottom">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuSeparator />
@@ -263,7 +337,7 @@ export default function PetDetails() {
                       <p className="flex-1 text-center text-sm"><span className="font-semibold">Diagnosed at:</span> {disease.diagnosis_date.toString()}</p>
                       <div>
                         <DropdownMenu>
-                          <DropdownMenuTrigger className="bg-neutral-900 p-1 rounded-md cursor-pointer"><EllipsisVertical className="h-4 w-4" /></DropdownMenuTrigger>
+                          <DropdownMenuTrigger className="dark:bg-neutral-900 bg-gray-300 p-1 rounded-md cursor-pointer"><EllipsisVertical className="h-4 w-4" /></DropdownMenuTrigger>
                           <DropdownMenuContent side="bottom">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuSeparator />
@@ -301,6 +375,56 @@ export default function PetDetails() {
           </div>
 
           <Separator className="dark:bg-neutral-700" />
+
+            <div className="flex flex-col gap-3">
+              <div className="flex justify-between items-center">
+                <h3 className="text-base font-semibold">Observations</h3>
+                <Button variant={'outline'} size={'sm'} onClick={() => setNewObservationIsOpen(!newObservationIsOpen)}>{newObservationIsOpen ? <><Minus />Close add observation</> : <><Plus />Add Observation</>}</Button>
+              </div>
+              <div className="flex flex-col gap-2 text-sm">
+                {petObservations?.data.length === 0 && (
+                    <Empty className="gap-2">
+                      <EmptyHeader className="gap-0">
+                        <EmptyMedia variant="icon">
+                          <Search />
+                        </EmptyMedia>
+                        <EmptyTitle className="my-0">No observations registered yet</EmptyTitle>
+                      </EmptyHeader>
+                    </Empty>
+                )}
+                {petObservations?.data.map((observation, index) => (
+                  <div className="border border-slate-200 dark:border-neutral-700 rounded-md p-3 bg-slate-50 dark:bg-neutral-900/40">
+                    <div className="flex items-baseline gap-3">
+                      <h2 className="font-bold text-lg mb-4">Observation #{index + 1}</h2>
+                      <DropdownMenu>
+                          <DropdownMenuTrigger className="dark:bg-neutral-900 bg-gray-300 rounded-md cursor-pointer p-0 h-6 w-6 flex items-center justify-center"><Ellipsis className="h-4 w-4" /></DropdownMenuTrigger>
+                          <DropdownMenuContent side="bottom">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="cursor-pointer" onSelect={() => handleOpenUpdateObservation(observation)}>Update</DropdownMenuItem>
+                            <DropdownMenuItem className="cursor-pointer" onSelect={() => handleOpenDeleteObservation(observation)}>Delete</DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+                    <p className="text-slate-700 dark:text-slate-200">{observation.description}</p>
+                  </div>
+                ))}
+                {newObservationIsOpen &&
+                  <>
+                    <Separator />
+                    <ErrorBox errors={observationValidationErrors} />
+                    <form onSubmit={observationSubmit(sendObeservationToApi)} className="flex flex-col gap-2">
+                      <Textarea
+                        {...registerObservation('description')}
+                        placeholder="insert the observation here" />
+                      <Button type="submit">Add</Button>
+                    </form>
+                  </>
+                }
+              </div>
+            </div>
+
+            <Separator className="dark:bg-neutral-700"/>
 
           <div className="flex flex-col gap-3">
             <h3 className="text-base font-semibold">Map</h3>
@@ -370,6 +494,12 @@ export default function PetDetails() {
         <DialogContent>
           <CreateDiseaseModal handleOpen={handleCreateDisaeseOpenChange} pet={petData?.data as Pet}/>
         </DialogContent>
+      </Dialog>
+      <Dialog open={deleteObservationModalIsOpen} onOpenChange={handleDeleteObservationIsOpen}>
+          {selectedObservation && <DeletePetObservationModal observation={selectedObservation} openChange={handleDeleteObservationIsOpen}/>}
+      </Dialog>
+      <Dialog open={updatePetObservationModalIsOpen} onOpenChange={handleUpdateObservationIsOpen}>
+          {selectedObservation && <UpdatePetObservationModal observation={selectedObservation} openChange={handleUpdateObservationIsOpen} />}
       </Dialog>
     </div>
   );
