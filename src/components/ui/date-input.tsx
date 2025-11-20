@@ -38,11 +38,13 @@ function isValidDate(date: Date | undefined) {
 export function DatepickerInput({
 	value,
 	onChange,
-	label
+	label,
+	disabled
 }: {
 	value: Date | undefined;
 	onChange: (date: Date | undefined) => void;
-	label: string
+	label: string,
+	disabled?: boolean
 }) {
 	const [open, setOpen] = React.useState(false);
 	const [month, setMonth] = React.useState<Date | undefined>(value);
@@ -62,6 +64,7 @@ export function DatepickerInput({
 					id="date"
 					value={textValue}
 					placeholder="June 01, 2025"
+					disabled={disabled}
 					className="bg-background pr-10"
 					onChange={(e) => {
 						const parsedDate = new Date(e.target.value);
@@ -83,6 +86,7 @@ export function DatepickerInput({
 						<Button
 							id="date-picker"
 							variant="ghost"
+							disabled={disabled}
 							className="absolute top-1/2 right-2 size-6 -translate-y-1/2"
 						>
 							<CalendarIcon className="size-3.5" />

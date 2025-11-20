@@ -2,7 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Syringe, BadgeInfo, MapPin, Phone, Mail, Dog, Cat, EllipsisVertical, Plus, ScanHeart, ArrowUpRightIcon, Ellipsis, Search, Minus } from "lucide-react";
+import { Syringe, BadgeInfo, MapPin, Phone, Mail, Dog, Cat, EllipsisVertical, Plus, ScanHeart, ArrowUpRightIcon, Ellipsis, Search, Minus, Pill } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
   ToggleGroup,
@@ -33,17 +33,31 @@ import { usePetObservations } from "@/hooks/PetObservations/UsePetObservations";
 import ErrorBox from "../global/error-advertise";
 import DeletePetObservationModal from "../PetDetails/DeletePetObservation";
 import UpdatePetObservationModal from "../PetDetails/UpdatePetObservationModal";
+import { useListPetContinuousTreatments } from "@/hooks/PetMedications/useListPetContinuousTreatments";
+import CreatePetMedicationsModal from "../PetDetails/CreatePetMedicationsModal";
+import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
+import { Label } from "../ui/label";
+import { formatReadableDate } from "@/lib/formatter";
+import { useListPetPeriodicTreatments } from "@/hooks/PetMedications/useListPetPeriodicTreatments";
+import { useListPetUniqueTreatments } from "@/hooks/PetMedications/useListPetUniqueTreatments";
+import DeleteMedicationModal from "../PetDetails/DeletePetMedicationModal";
 
 
 export default function PetDetails() {
   const [diseaseSection, setDiseaseSection] = useState<'chronic' | 'normal'>('chronic');
+  const [treatmentSection, setTreatmentSection] = useState<"continuous" | "periodic" | "unique">('continuous')
 
   const [selectedDisease, setSelectedDisease] = useState<PetDisease | undefined>(undefined);
   const [selectedObservation, setSelectedObservation] = useState<PetObservation | undefined>(undefined);
+  const [selectedMedication, setSelectedMedication] = useState<PetMedication | undefined>(undefined);
 
   const [ createDiseaseModalIsOpen, setCreateDiseaseModalIsOpen ] = useState<boolean>(false);
 
   const [ newObservationIsOpen, setNewObservationIsOpen ] = useState<boolean>(false);
+
+  const [ petContinuosTreatmentsIndexType, setPetContinuosTreatmentsIndexType] = useState<"all" | "active" | "inactive">('all')
+  const [ petPeriodicTreatmentsIndexType, setPetPeriodicTreatmentsIndexType] = useState<"all" | "active" | "inactive">('all')
+  const [ petUniqueTreatmentsIndexType, setPetUniqueTreatmentsIndexType] = useState<"all" | "active" | "inactive">('all')
 
   const handleOpenCreateDisease = () => {
     setCreateDiseaseModalIsOpen(true);
@@ -109,6 +123,30 @@ export default function PetDetails() {
     }
   }
 
+  const [ createPetMedicationsIsOpen, setCreatePetMedicationsIsOpen ] = useState<boolean>(false);
+
+  const handleOpenCreateMedicationsModal = () => {
+    setCreatePetMedicationsIsOpen(true);
+  }
+
+    const handleOpenCreateMedicationsChange = (open: boolean) => {
+    setCreatePetMedicationsIsOpen(open);
+  }
+
+  const [deleteMedicationIsOpen, setDeleteMedicationIsOpen ] = useState<boolean>(false);
+
+  const handleOpenDeleteMedication = (medication: PetMedication) => {
+    setSelectedMedication(medication);
+    setDeleteMedicationIsOpen(true);
+  }
+
+  const handleDeleteMedicationOpenChange = (open: boolean) => {
+    setDeleteMedicationIsOpen(open);
+    if(!open){
+      setSelectedMedication(undefined);
+    }
+  }
+
   const {
     data: petData,
     isLoading: petIsLoading,
@@ -162,6 +200,25 @@ export default function PetDetails() {
     error: observationsError
   } = usePetObservations(petData?.data.id as number);
 
+
+  const {
+    data: petContinuousMedications,
+    isFetching: continuosMedicationsIsFetching,
+    error: continuousMedicationsError
+  } = useListPetContinuousTreatments(petData?.data.id as number, petContinuosTreatmentsIndexType)
+
+  const {
+    data: petPeriodicMedications,
+    isFetching: periodicMedicationsIsFetching,
+    error: periodicMedicationsError
+  } = useListPetPeriodicTreatments(petData?.data.id as number, petPeriodicTreatmentsIndexType)
+
+  const {
+    data: petUniqueMedications,
+    isFetching: uniqueMedicationsIsFetching,
+    error: uniqueMedicationsError
+  } = useListPetUniqueTreatments(petData?.data.id as number, petUniqueTreatmentsIndexType)
+
   const customBadgeColorForDiseaseStatus = (diseaseStatus: string) => {
     switch (diseaseStatus){
       case "confirmed":
@@ -196,14 +253,19 @@ export default function PetDetails() {
                   <Badge>
                     {petData?.data.specie.name}
                   </Badge>
-                  <Badge className="">
-                    {age.years == 0 ? "" : age.years}
-                    {" "}
-                    {age.years > 1 ? "years" : ""}
-                    {" "}
-                    {age.months > 0 ? age.months : ""}
-                    {" "}
-                    {age.months > 1 ? "months" : "month"}
+                  <Badge>
+                    {age.years > 0 && (
+                      <>
+                        {age.years} {age.years === 1 ? "year" : "years"}
+                      </>
+                    )}
+
+                    {age.months > 0 && (
+                      <>
+                        {age.years > 0 && " "}
+                        {age.months} {age.months === 1 ? "month" : "months"}
+                      </>
+                    )}
                   </Badge>
                   <Badge className="bg-blue-400">
                     {petData?.data.sex}
@@ -215,54 +277,14 @@ export default function PetDetails() {
 
           <Separator className="dark:bg-neutral-700 my-4" />
 
-          <div className="flex flex-col gap-3 text-sm">
-            <div className="flex items-center justify-between h-[28px]">
-              <div className="flex items-center gap-2">
-                <Syringe className="h-4 w-4 text-emerald-600" />
-                <span>Status de vacine</span>
-              </div>
-              <span className="text-slate-600 dark:text-slate-300">Em dia</span>
-            </div>
-
-            <div className="flex items-center justify-between h-[28px]">
-              <div className="flex items-center gap-2">
-                <BadgeInfo className="h-4 w-4 text-cyan-600" />
-                <span>Microchip</span>
-              </div>
-              <span className="text-slate-600 dark:text-slate-300">#1945</span>
-            </div>
-          </div>
-
-          <Separator className="dark:bg-neutral-700" />
-
-          <div className="flex flex-col gap-3">
-            <h3 className="text-base font-semibold">Alergias</h3>
-            <div className="flex flex-col gap-2 text-sm">
-              <div className="flex items-start justify-between">
-                <span className="text-slate-700 dark:text-slate-200">Alergias registradas:</span>
-                <span className="text-slate-600 dark:text-slate-300 text-right">
-                  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Temporibus, velit tempore cum quasi libero molestiae maiores vel repellendus?
-                </span>
-              </div>
-              <div className="flex items-start justify-between">
-                <span className="text-slate-700 dark:text-slate-200">Observações:</span>
-                <span className="text-slate-600 dark:text-slate-300 text-right">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Laudantium, nisi sed? At eaque fuga, eius rem excepturi libero eligendi tempora quidem ipsa laboriosam voluptatem quasi dolorum placeat quae distinctio sunt!
-                </span>
-              </div>
-            </div>  
-          </div>
-
-          <Separator className="dark:bg-neutral-700" />
-
           <div className="flex flex-col gap-8 mb-6">
             <div className="flex flex-col gap-3">
               <div className="flex flex-1 items-center mb-2">
                 <div className="flex flex-1">
-                  <div className={`cursor-pointer hover:bg-neutral-600 h-full p-2 ${diseaseSection === 'chronic' ? "border-b-2 border-b-cyan-500 font-bold" : ""}`} onClick={() => setDiseaseSection('chronic')}>
+                  <div className={`cursor-pointer hover:bg-gray-200 dark:hover:bg-neutral-600 h-full p-2 ${diseaseSection === 'chronic' ? "border-b-2 border-b-cyan-500 font-bold" : ""}`} onClick={() => setDiseaseSection('chronic')}>
                     Chronic Diseases
                   </div>
-                  <div className={`cursor-pointer hover:bg-neutral-600 h-full p-2 ${diseaseSection === 'normal' ? "border-b-2 border-b-cyan-500 font-bold" : ""}`} onClick={() => setDiseaseSection('normal')}>
+                  <div className={`cursor-pointer hover:bg-gray-200 dark:hover:bg-neutral-600 h-full p-2 ${diseaseSection === 'normal' ? "border-b-2 border-b-cyan-500 font-bold" : ""}`} onClick={() => setDiseaseSection('normal')}>
                     Normal Diseases
                   </div>
                 </div>
@@ -288,7 +310,7 @@ export default function PetDetails() {
                   )}
                   {petChronicDiseases?.data.map((disease, index) => (
                     <div key={disease.id} className="flex items-center border p-3 rounded-md dark:bg-neutral-900/40 dark:border-neutral-700">
-                      <div className="flex">
+                      <div className="flex flex-1">
                         <span className="font-semibold">{disease.name}</span>
                         <Badge className={`mx-2 ${customBadgeColorForDiseaseStatus(disease.diagnosis_status)}`}>{disease.diagnosis_status}</Badge>
                       </div>
@@ -329,7 +351,7 @@ export default function PetDetails() {
                   )}
                   {petNormalDiseases?.data.map((disease, index) => (
                     <div key={disease.id} className="flex items-center border p-3 rounded-md dark:bg-neutral-900/40 dark:border-neutral-700">
-                      <div className="flex">
+                      <div className="flex flex-1">
                         <span className="font-semibold">{disease.name}</span>
                         <Badge className={`mx-2 ${customBadgeColorForDiseaseStatus(disease.diagnosis_status)}`}>{disease.diagnosis_status}</Badge>
                       </div>
@@ -355,11 +377,204 @@ export default function PetDetails() {
 
             <Separator className="dark:bg-neutral-700" />
             <div className="flex flex-col gap-3">
-              <h3 className="text-base font-semibold">Tratamentos de remédios</h3>
-              <div className="flex flex-col gap-2 text-sm border border-slate-200 dark:border-neutral-700 rounded-md p-3 bg-slate-50 dark:bg-neutral-900/40">
-                <p className="text-slate-700 dark:text-slate-200">- Antibiótico: tadafila — 250mg (2x ao dia)</p>
-                <p className="text-slate-700 dark:text-slate-200">- Anti-inflamatório: viagra — 5mg (1x ao dia)</p>
-                <p className="text-slate-600 dark:text-slate-400 italic">Duração prevista até 12/11/2025</p>
+              <div className="flex flex-1 items-center mb-2">
+                <div className="flex flex-1">
+                  <div className={`cursor-pointer hover:bg-gray-200 dark:hover:bg-neutral-600 h-full p-2 ${treatmentSection === "continuous" ? "border-b-2 border-b-cyan-500 font-bold" : ""}`} onClick={() => setTreatmentSection('continuous')}>
+                    Continuous Treatments
+                  </div>
+                  <div className={`cursor-pointer hover:bg-gray-200 dark:hover:bg-neutral-600 h-full p-2 ${treatmentSection === "periodic" ? "border-b-2 border-b-cyan-500 font-bold" : ""}`} onClick={() => setTreatmentSection('periodic')}>
+                    Periodic Treatments
+                  </div>
+                  <div className={`cursor-pointer hover:bg-gray-200 dark:hover:bg-neutral-600 h-full p-2 ${treatmentSection === 'unique' ? "border-b-2 border-b-cyan-500 font-bold" : ""}`} onClick={() => setTreatmentSection('unique')}>
+                    Unique dose
+                  </div>
+                </div>
+                <Button size={"sm"} variant={'outline'} className="text-xs" onClick={handleOpenCreateMedicationsModal}><Plus /> Register new treatment</Button>
+              </div>
+              <div className="flex flex-col gap-2">
+                {treatmentSection === 'continuous' && (
+                  <>
+                    <div className="my-2">
+                      <RadioGroup defaultValue='all' value={petContinuosTreatmentsIndexType} onValueChange={(e) => setPetContinuosTreatmentsIndexType(e as any)} className='flex items-center gap-4'>
+                        <div className='flex items-center gap-2'>
+                          <RadioGroupItem value='all' id='all' />
+                          <Label htmlFor='all'>All</Label>
+                        </div>
+                        <div className='flex items-center gap-2'>
+                          <RadioGroupItem value='active' id='active' />
+                          <Label htmlFor='active'>Active</Label>
+                        </div>
+                        <div className='flex items-center gap-2'>
+                          <RadioGroupItem value='inactive' id='inactive' />
+                          <Label htmlFor='advanced'>Inactive</Label>
+                        </div>
+                      </RadioGroup>
+                    </div>
+                    {petContinuousMedications?.data.length === 0 && (
+                      <Empty className="gap-2">
+                        <EmptyHeader className="gap-0">
+                          <EmptyMedia variant="icon">
+                            <Pill />
+                          </EmptyMedia>
+                          <EmptyTitle className="my-0">
+                            {petContinuosTreatmentsIndexType === "all" && (
+                                <p>No continuous treatments registered</p>
+                            )}
+                            {petContinuosTreatmentsIndexType === "active" && (
+                                <p>No active continuous treatments registered</p>
+                            )}
+                            {petContinuosTreatmentsIndexType === "inactive" && (
+                                <p>No inactive continuous treatments registered</p>
+                            )}
+                          </EmptyTitle>
+                        </EmptyHeader>
+                      </Empty>
+                    )}
+                    {petContinuousMedications?.data.map((medication) => (
+                      <div key={medication.id} className="flex items-center border p-3 rounded-md dark:bg-neutral-900/40 dark:border-neutral-700">
+                      <div className="flex flex-1">
+                        <span className="font-semibold">{medication.name}</span>
+                        <Badge className={`mx-2 bg-blue-600`}>{medication.type}</Badge>
+                      </div>
+                      <p className="flex-1 text-center text-sm"><span className="font-semibold">Start:</span> {formatReadableDate(medication.start_date.toString())}</p>
+                      <div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger className="dark:bg-neutral-900 bg-gray-300 p-1 rounded-md cursor-pointer"><EllipsisVertical className="h-4 w-4" /></DropdownMenuTrigger>
+                          <DropdownMenuContent side="bottom">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="cursor-pointer">Update</DropdownMenuItem>
+                            <DropdownMenuItem className="cursor-pointer" onClick={() => handleOpenDeleteMedication(medication)}>Delete</DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </div>
+                    ))}
+                  </>
+                )}
+                {treatmentSection === 'periodic' && (
+                  <>
+                    <div className="my-2">
+                      <RadioGroup defaultValue='all' value={petPeriodicTreatmentsIndexType} onValueChange={(e) => setPetPeriodicTreatmentsIndexType(e as any)} className='flex items-center gap-4'>
+                        <div className='flex items-center gap-2'>
+                          <RadioGroupItem value='all' id='all' />
+                          <Label htmlFor='all'>All</Label>
+                        </div>
+                        <div className='flex items-center gap-2'>
+                          <RadioGroupItem value='active' id='active' />
+                          <Label htmlFor='active'>Active</Label>
+                        </div>
+                        <div className='flex items-center gap-2'>
+                          <RadioGroupItem value='inactive' id='inactive' />
+                          <Label htmlFor='advanced'>Inactive</Label>
+                        </div>
+                      </RadioGroup>
+                    </div>
+                    {petPeriodicMedications?.data.length === 0 && (
+                      <Empty className="gap-2">
+                        <EmptyHeader className="gap-0">
+                          <EmptyMedia variant="icon">
+                            <Pill />
+                          </EmptyMedia>
+                          <EmptyTitle className="my-0">
+                            {petPeriodicTreatmentsIndexType === "all" && (
+                                <p>No periodic treatments registered</p>
+                            )}
+                            {petPeriodicTreatmentsIndexType === "active" && (
+                                <p>No active periodic treatments registered</p>
+                            )}
+                            {petPeriodicTreatmentsIndexType === "inactive" && (
+                                <p>No inactive periodic treatments registered</p>
+                            )}
+                          </EmptyTitle>
+                        </EmptyHeader>
+                      </Empty>
+                    )}
+                    {petPeriodicMedications?.data.map((medication) => (
+                      <div key={medication.id} className="flex items-center border p-3 rounded-md dark:bg-neutral-900/40 dark:border-neutral-700">
+                      <div className="flex flex-1">
+                        <span className="font-semibold">{medication.name}</span>
+                        <Badge className={`mx-2 bg-blue-600`}>{medication.type}</Badge>
+                      </div>
+                      <p className="flex-1 text-center text-sm"><span className="font-semibold">Start:</span> {formatReadableDate(medication.start_date.toString())}</p>
+                      <p className="flex-1 text-center text-sm"><span className="font-semibold">End:</span> {medication.end_date ? formatReadableDate(medication.end_date.toString()): ""}</p>
+                      <div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger className="dark:bg-neutral-900 bg-gray-300 p-1 rounded-md cursor-pointer"><EllipsisVertical className="h-4 w-4" /></DropdownMenuTrigger>
+                          <DropdownMenuContent side="bottom">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="cursor-pointer">Update</DropdownMenuItem>
+                            <DropdownMenuItem className="cursor-pointer" onClick={() => handleOpenDeleteMedication(medication)}>Delete</DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </div>
+                    ))}
+                  </>
+                )}
+                {treatmentSection === 'unique' && (
+                  <>
+                    <div className="my-2">
+                      <RadioGroup defaultValue='all' value={petUniqueTreatmentsIndexType} onValueChange={(e) => setPetUniqueTreatmentsIndexType(e as any)} className='flex items-center gap-4'>
+                        <div className='flex items-center gap-2'>
+                          <RadioGroupItem value='all' id='all' />
+                          <Label htmlFor='all'>All</Label>
+                        </div>
+                        <div className='flex items-center gap-2'>
+                          <RadioGroupItem value='active' id='active' />
+                          <Label htmlFor='active'>Active</Label>
+                        </div>
+                        <div className='flex items-center gap-2'>
+                          <RadioGroupItem value='inactive' id='inactive' />
+                          <Label htmlFor='advanced'>Inactive</Label>
+                        </div>
+                      </RadioGroup>
+                    </div>
+                    {petUniqueMedications?.data.length === 0 && (
+                      <Empty className="gap-2">
+                        <EmptyHeader className="gap-0">
+                          <EmptyMedia variant="icon">
+                            <Pill />
+                          </EmptyMedia>
+                          <EmptyTitle className="my-0">
+                            {petUniqueTreatmentsIndexType === "all" && (
+                                <p>No single dose treatments registered</p>
+                            )}
+                            {petUniqueTreatmentsIndexType === "active" && (
+                                <p>No active single dose treatments registered</p>
+                            )}
+                            {petUniqueTreatmentsIndexType === "inactive" && (
+                                <p>No inactive single dose treatments registered</p>
+                            )}
+                          </EmptyTitle>
+                        </EmptyHeader>
+                      </Empty>
+                    )}
+                    {petUniqueMedications?.data.map((medication) => (
+                      <div key={medication.id} className="flex items-center border p-3 rounded-md dark:bg-neutral-900/40 dark:border-neutral-700">
+                      <div className="flex flex-1">
+                        <span className="font-semibold">{medication.name}</span>
+                        <Badge className={`mx-2 bg-blue-600`}>{medication.type}</Badge>
+                      </div>
+                      <p className="flex-1 text-center text-sm"><span className="font-semibold">Start:</span> {formatReadableDate(medication.start_date.toString())}</p>
+                      <p className="flex-1 text-center text-sm"><span className="font-semibold">End:</span> {medication.end_date ? formatReadableDate(medication.end_date.toString()): ""}</p>
+                      <div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger className="dark:bg-neutral-900 bg-gray-300 p-1 rounded-md cursor-pointer"><EllipsisVertical className="h-4 w-4" /></DropdownMenuTrigger>
+                          <DropdownMenuContent side="bottom">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="cursor-pointer">Update</DropdownMenuItem>
+                            <DropdownMenuItem className="cursor-pointer" onClick={() => handleOpenDeleteMedication(medication)}>Delete</DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </div>
+                    ))}
+                  </>
+                )}
+
               </div>
             </div>
 
@@ -500,6 +715,14 @@ export default function PetDetails() {
       </Dialog>
       <Dialog open={updatePetObservationModalIsOpen} onOpenChange={handleUpdateObservationIsOpen}>
           {selectedObservation && <UpdatePetObservationModal observation={selectedObservation} openChange={handleUpdateObservationIsOpen} />}
+      </Dialog>
+      {petData !== undefined && (
+          <Dialog open={createPetMedicationsIsOpen} onOpenChange={handleOpenCreateMedicationsChange}>
+            <CreatePetMedicationsModal handleOpen={handleOpenCreateMedicationsChange} pet={petData?.data as Pet}/>
+        </Dialog>
+      )}
+        <Dialog open={deleteMedicationIsOpen} onOpenChange={handleDeleteMedicationOpenChange}>
+          {selectedMedication && <DeleteMedicationModal selectedMedication={selectedMedication} handleOpen={handleDeleteMedicationOpenChange} />}
       </Dialog>
     </div>
   );
