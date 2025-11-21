@@ -41,6 +41,8 @@ import { formatReadableDate } from "@/lib/formatter";
 import { useListPetPeriodicTreatments } from "@/hooks/PetMedications/useListPetPeriodicTreatments";
 import { useListPetUniqueTreatments } from "@/hooks/PetMedications/useListPetUniqueTreatments";
 import DeleteMedicationModal from "../PetDetails/DeletePetMedicationModal";
+import { PetMedication } from "@/types/petMedications/PetMedications";
+import UpdatePetMedicationsModal from "../PetDetails/UpdatePetMedicationsModal";
 
 
 export default function PetDetails() {
@@ -142,6 +144,20 @@ export default function PetDetails() {
 
   const handleDeleteMedicationOpenChange = (open: boolean) => {
     setDeleteMedicationIsOpen(open);
+    if(!open){
+      setSelectedMedication(undefined);
+    }
+  }
+
+  const [updateMedicationIsOpen, setUpdateMedicationIsOpen ] = useState<boolean>(false);
+
+  const handleOpenUpdateMedication = (medication: PetMedication) => {
+    setSelectedMedication(medication);
+    setUpdateMedicationIsOpen(true);
+  }
+
+  const handleUpdateMedicationOpenChange = (open: boolean) => {
+    setUpdateMedicationIsOpen(open);
     if(!open){
       setSelectedMedication(undefined);
     }
@@ -443,7 +459,7 @@ export default function PetDetails() {
                           <DropdownMenuContent side="bottom">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem className="cursor-pointer">Update</DropdownMenuItem>
+                            <DropdownMenuItem className="cursor-pointer" onClick={() => handleOpenUpdateMedication(medication)}>Update</DropdownMenuItem>
                             <DropdownMenuItem className="cursor-pointer" onClick={() => handleOpenDeleteMedication(medication)}>Delete</DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -504,7 +520,7 @@ export default function PetDetails() {
                           <DropdownMenuContent side="bottom">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem className="cursor-pointer">Update</DropdownMenuItem>
+                            <DropdownMenuItem className="cursor-pointer" onClick={() => handleOpenUpdateMedication(medication)}>Update</DropdownMenuItem>
                             <DropdownMenuItem className="cursor-pointer" onClick={() => handleOpenDeleteMedication(medication)}>Delete</DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -565,7 +581,7 @@ export default function PetDetails() {
                           <DropdownMenuContent side="bottom">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem className="cursor-pointer">Update</DropdownMenuItem>
+                            <DropdownMenuItem className="cursor-pointer" onClick={() => handleOpenUpdateMedication(medication)}>Update</DropdownMenuItem>
                             <DropdownMenuItem className="cursor-pointer" onClick={() => handleOpenDeleteMedication(medication)}>Delete</DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -721,8 +737,11 @@ export default function PetDetails() {
             <CreatePetMedicationsModal handleOpen={handleOpenCreateMedicationsChange} pet={petData?.data as Pet}/>
         </Dialog>
       )}
-        <Dialog open={deleteMedicationIsOpen} onOpenChange={handleDeleteMedicationOpenChange}>
+      <Dialog open={deleteMedicationIsOpen} onOpenChange={handleDeleteMedicationOpenChange}>
           {selectedMedication && <DeleteMedicationModal selectedMedication={selectedMedication} handleOpen={handleDeleteMedicationOpenChange} />}
+      </Dialog>
+      <Dialog open={updateMedicationIsOpen} onOpenChange={handleUpdateMedicationOpenChange}>
+          {selectedMedication && <UpdatePetMedicationsModal petId={petData?.data.id as number} selectedMedication={selectedMedication} handleOpen={handleUpdateMedicationOpenChange}/>}
       </Dialog>
     </div>
   );

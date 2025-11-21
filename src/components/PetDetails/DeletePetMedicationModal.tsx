@@ -4,6 +4,7 @@ import { Button } from "../ui/button";
 import { DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
 import { useQueryClient } from "@tanstack/react-query";
 import { useDeletePetMedications } from "@/hooks/PetMedications/useDeletePetMedications";
+import { PetMedication } from "@/types/petMedications/PetMedications";
 
 type DeleteMedicationModalProps = {
     selectedMedication: PetMedication,

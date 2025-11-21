@@ -1,8 +1,8 @@
-type PetMedication = {
+export type PetMedication = {
     id: number,
     name: string,
-    type: string,
-    treatment_type: string,
+    type: MedicationType,
+    treatment_type: TreatmentType,
     dosage_form: string,
     dosing_interval: number | null,
     interval_unit: string | null,
@@ -13,3 +13,20 @@ type PetMedication = {
     created_at: Date,
     updated_at: Date
 }
+
+export type TreatmentType = "continuous" | "periodic" | "unique";
+
+export type MedicationType =   "Antibiotic" |
+  "Analgesic" |
+  "Anti-inflammatory" |
+  "Antiparasitic" |
+  "Dewormer" |
+  "Supplement" |
+  "Antifungal" |
+  "Sedative" |
+  "Anesthetic" |
+  "Diuretic" |
+  "Vitamin" |
+  "Antihistamine" |
+  "Hormone Therapy" |
+  "Chemotherapy"

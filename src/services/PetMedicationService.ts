@@ -1,7 +1,9 @@
 import { api } from "@/lib/axios"
 import { CreatePetDiseaseSchemaType } from "@/schemas/PetDiseases/CreatePetDiseaseSchema"
 import { RegisterPetMedicationsSchemaType } from "@/schemas/petMedications/RegisterPetMedicationsSchema";
+import { UpdatePetMedicationsSchemaType } from "@/schemas/petMedications/UpdatePetMedicationSchema";
 import { ApiResponse } from "@/types/ApiResponse";
+import { PetMedication } from "@/types/petMedications/PetMedications";
 
 const registerNewMedication = async(
     medication_data: RegisterPetMedicationsSchemaType
@@ -66,10 +68,29 @@ const deletePetMedications = async (
     }
 }
 
+const updatePetMedications = async(
+    {
+        medication_id,
+        medication_data
+    }: {
+        medication_id: number,
+        medication_data: UpdatePetMedicationsSchemaType
+    }
+): Promise<ApiResponse<PetMedication>> => {
+    try{
+        const response = await api.patch(`/pet-medications/${medication_id}`, medication_data);
+        
+        return response.data;
+    }catch(error){
+        throw error
+    }
+}
+
 export const PetMedicationService = {
     registerNewMedication,
     getPetContinuousMedications,
     getPetPeriodicMedications,
     getPetUniqueDoseMedications,
+    updatePetMedications,
     deletePetMedications
 }
